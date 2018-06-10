@@ -15,7 +15,8 @@ def safe_call(bm, method_name, err_callback):
 def main():
     module = importlib.import_module(sys.argv[1]
                                      .replace(".py", "")
-                                     .replace("/", "."))
+                                     .replace("/", "."),
+                                     package=".")
     bm = module.BuildManifest()
     if not os.path.exists("build"):
         os.makedirs("build")

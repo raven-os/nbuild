@@ -17,6 +17,9 @@ def main():
                                      .replace(".py", "")
                                      .replace("/", "."))
     bm = module.BuildManifest()
+    if not os.path.exists("build"):
+        os.makedirs("build")
+    os.chdir("build")
     if not os.path.exists("{}-{}".format(bm.name, bm.version)):
         os.makedirs("{}-{}".format(bm.name, bm.version))
     os.chdir("{}-{}".format(bm.name, bm.version))
@@ -31,6 +34,9 @@ def main():
     bm.configure()
     print("Compiling...")
     bm.compile()
+    print("Checking...")
+    bm.check()
+
 
     os.chdir("..")
     # shutil.rmtree("f{bm.name}-{bm.version}")

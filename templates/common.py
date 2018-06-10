@@ -52,7 +52,7 @@ class Common:
 
     def unpack(self):
         unpack(self.filename)
-        os.chdir("{}-{}".format(self.name, self.version))
+        os.chdir("{}-{}".format(self.name.lower(), self.version))
 
     def configure(self):
         if "configure" in self.kwargs:

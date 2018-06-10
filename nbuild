@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+
+import sys
+import importlib
+import os
+
+
+def safe_call(bm, method_name, err_callback):
+    try:
+        getattr(bm, method_name)()
+    except AttributeError as e:
+        err_callback(e)
+
+
+def main():
+    module = importlib.import_module(sys.argv[1]
+                                     .replace(".py", "")
+                                     .replace("/", "."))
+    bm = module.BuildManifest()
+    if not os.path.exists("{}-{}".format(bm.name, bm.version)):
+        os.makedirs("{}-{}".format(bm.name, bm.version))
+    os.chdir("{}-{}".format(bm.name, bm.version))
+
+    print("Fetching...")
+    bm.fetch()
+    print("Unpacking...")
+    bm.unpack()
+    print("Patching...")
+    safe_call(bm, "patch", lambda err: None)
+    print("Configuring...")
+    bm.configure()
+    print("Compiling...")
+    bm.compile()
+
+    os.chdir("..")
+    # shutil.rmtree("f{bm.name}-{bm.version}")
+
+
+if __name__ == "__main__":
+    main()

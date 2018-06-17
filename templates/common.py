@@ -4,6 +4,7 @@ import tarfile
 import os
 
 import templates.autotools
+import templates.BaseManifest
 
 
 def _download_file(url, local_filename):
@@ -40,19 +41,20 @@ def unpack(filename):
         tar.extractall()
 
 
-class Common:
+class Common(templates.BaseManifest.BaseManifest):
     def __init__(self, name, version, *args, **kwargs):
+        templates.BaseManifest.BaseManifest.__init__(self)
         self.name = name
         self.version = version
         self.kwargs = kwargs
 
     def fetch(self):
         if "fetch" in self.kwargs:
-            self.filename = fetch(**self.kwargs["fetch"])
+            self.to_save["filename"] = fetch(**self.kwargs["fetch"])
 
     def unpack(self):
-        unpack(self.filename)
-        os.chdir("{}-{}".format(self.name.lower(), self.version))
+        unpack(self.to_save["filename"])
+        os.chdir("{}-{}".format(self.name, self.version))
 
     def configure(self):
         if "configure" in self.kwargs:

@@ -12,6 +12,37 @@ def safe_call(bm, method_name, err_callback):
         err_callback(e)
 
 
+def run_cmds(bm, *cmds):
+    bm.to_save["base_path"] = os.getcwd()
+    step_path = os.path.join(bm.to_save["base_path"], ".step")
+
+    if os.path.exists(step_path):
+        with open(step_path, "r") as f:
+            step = f.readline()[:-1]
+            if step != "" and step in cmds:
+                cmds = cmds[cmds.index(step):]
+                print("Starting at step {}".format(step))
+                bm.on_resume()
+
+    for c in cmds:
+        cmd = None
+        try:
+            cmd = getattr(bm, c)
+        except AttributeError:
+            print("Skipping step '{}'".format(c))
+            continue
+
+        print("Executing '{}'".format(c))
+        try:
+            cmd()
+        except Exception as e:
+            print("{}: {}".format(c, e), file=sys.stderr)
+            with open(step_path, "w") as f:
+                print(c, file=f)
+            bm.on_abort()
+            return
+
+
 def main():
     module = importlib.import_module(sys.argv[1]
                                      .replace(".py", "")
@@ -25,18 +56,7 @@ def main():
         os.makedirs("{}-{}".format(bm.name, bm.version))
     os.chdir("{}-{}".format(bm.name, bm.version))
 
-    print("Fetching...")
-    bm.fetch()
-    print("Unpacking...")
-    safe_call(bm, "unpack", lambda err: None)
-    print("Patching...")
-    safe_call(bm, "patch", lambda err: None)
-    print("Configuring...")
-    safe_call(bm, "configure", lambda err: None)
-    print("Compiling...")
-    safe_call(bm, "compile", lambda err: None)
-    print("Checking...")
-    safe_call(bm, "check", lambda err: None)
+    run_cmds(bm, "fetch", "unpack", "patch", "configure", "compile", "check")
 
     os.chdir("..")
     # shutil.rmtree("f{bm.name}-{bm.version}")

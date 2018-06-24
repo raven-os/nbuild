@@ -5,6 +5,8 @@ from . import helpers
 
 def fetch(url, **kwargs):
     # subprocess.run(["rm", "-rf", url.split("/")[-1]])
-    cmd = ["git", "clone", url]
-    cmd += helpers.fmt_args(**kwargs)
-    subprocess.run(cmd)
+    env = None
+    if "env" in kwargs:
+        kwargs.pop("env")
+    cmd = helpers.fmt_args(["git", "clone", url], **kwargs)
+    return subprocess.run(cmd, env=env).returncode

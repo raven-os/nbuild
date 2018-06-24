@@ -2,6 +2,7 @@ import requests
 import hashlib
 import tarfile
 import os
+import subprocess
 
 import templates.autotools
 import templates.BaseManifest
@@ -41,6 +42,19 @@ def unpack(filename):
         tar.extractall()
 
 
+def patch(url, md5sum=None):
+    local_filename = url.split('/')[-1]
+    if md5sum is not None \
+            and os.path.exists(local_filename) \
+            and _md5(local_filename) == md5sum:
+                print("Using already present file '{}'".format(local_filename))
+                return local_filename
+    _download_file(url, local_filename)
+    if md5sum is not None and _md5(local_filename) != md5sum:
+        raise ValueError
+    return subprocess.run(["patch", "-Np1", "-i", local_filename]).returncode
+
+
 class Common(templates.BaseManifest.BaseManifest):
     def __init__(self, name, version, *args, **kwargs):
         templates.BaseManifest.BaseManifest.__init__(self)
@@ -51,21 +65,27 @@ class Common(templates.BaseManifest.BaseManifest):
     def fetch(self):
         if "fetch" in self.kwargs:
             self.to_save["filename"] = fetch(**self.kwargs["fetch"])
+            return 0
 
     def unpack(self):
         unpack(self.to_save["filename"])
         os.chdir("{}-{}".format(self.name, self.version))
+        return 0
+
+    def patch(self):
+        if "patch" in self.kwargs:
+            return patch(**self.kwargs["patch"])
 
     def configure(self):
         if "configure" in self.kwargs:
-            templates.autotools.configure(**self.kwargs["configure"])
+            return templates.autotools.configure(**self.kwargs["configure"])
 
     def compile(self):
-        templates.make.compile(**self.kwargs["compile"]
-                               if "compile" in self.kwargs
-                               else {})
+        return templates.make.compile(**self.kwargs["compile"]
+                                      if "compile" in self.kwargs
+                                      else {})
 
     def check(self):
-        templates.make.check(**self.kwargs["compile"]
-                             if "compile" in self.kwargs
-                             else {})
+        return templates.make.check(**self.kwargs["compile"]
+                                    if "compile" in self.kwargs
+                                    else {})

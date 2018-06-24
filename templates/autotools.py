@@ -4,6 +4,8 @@ from . import helpers
 
 
 def configure(*args, **kwargs):
-    cmd = ["./configure"]
-    cmd += helpers.fmt_args(**kwargs)
-    subprocess.run(cmd)
+    env = None
+    if "env" in kwargs:
+        kwargs.pop("env")
+    cmd = helpers.fmt_args(["./configure"], *args, **kwargs)
+    return subprocess.run(cmd, env=env).returncode

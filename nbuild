@@ -34,13 +34,22 @@ def run_cmds(bm, *cmds):
 
         print("Executing '{}'".format(c))
         try:
-            cmd()
+            returncode = cmd()
+            if isinstance(returncode, int) and returncode != 0:
+                print("{} returned {}".format(c, returncode), file=sys.stderr)
+                stop(bm, step_path, c)
+                return
         except Exception as e:
-            print("{}: {}".format(c, e), file=sys.stderr)
-            with open(step_path, "w") as f:
-                print(c, file=f)
-            bm.on_abort()
+            stop(bm, step_path, c, e)
             return
+
+
+def stop(bm, step_path, cmd, err=None):
+    if err is not None:
+        print("{}: {}".format(cmd, err), file=sys.stderr)
+    with open(step_path, "w") as f:
+        print(cmd, file=f)
+    bm.on_abort()
 
 
 def main():

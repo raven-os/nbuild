@@ -1,12 +1,16 @@
-def fmt_args(*args, **kwargs):
-    return list(args) \
-            + ["--{}{}".format(key,
-                               "={}".format(value)
-                               if value is not None
-                               else "")
-               if len(key) > 1
-               else "-{}{}".format(key,
-                                   " {}".format(value)
-                                   if value is not None
-                                   else "")
-               for key, value in kwargs.items()]
+def fmt_args(cmd, *args, **kwargs):
+    cmd += args
+
+    for key, value in kwargs.items():
+        li = []
+        if len(key) > 1:
+            var = "--{}".format(key)
+            if value is not None:
+                var += "={}".format(value)
+        else:
+            var = "-{}".format(key)
+            if value is not None:
+                var += "={}".format(value)
+        li.append(var)
+        cmd += li
+    return cmd

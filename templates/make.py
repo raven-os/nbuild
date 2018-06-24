@@ -6,6 +6,7 @@ from . import helpers
 def compile(*args, **kwargs):
     env = None
     if "env" in kwargs:
+        env = helpers.fmt_env(kwargs["env"])
         kwargs.pop("env")
     cmd = helpers.fmt_args(["make"], *args, **kwargs)
     return subprocess.run(cmd, env=env).returncode
@@ -14,6 +15,7 @@ def compile(*args, **kwargs):
 def check(*args, **kwargs):
     env = None
     if "env" in kwargs:
+        env = helpers.fmt_env(kwargs["env"])
         kwargs.pop("env")
     cmd = helpers.fmt_args(["make", "check"], *args, **kwargs)
     return subprocess.run(cmd, env=env).returncode

@@ -35,7 +35,8 @@ def run_cmds(bm, *cmds):
         print("Executing '{}'".format(c))
         try:
             returncode = cmd()
-            if isinstance(returncode, int) and returncode != 0:
+            if isinstance(returncode, int) and returncode != 0 or \
+                    isinstance(returncode, bool) and not returncode:
                 print("{} returned {}".format(c, returncode), file=sys.stderr)
                 stop(bm, step_path, c)
                 return

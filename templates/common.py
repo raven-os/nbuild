@@ -3,6 +3,7 @@ import hashlib
 import tarfile
 import os
 import subprocess
+import toml
 
 import templates.autotools
 import templates.BaseManifest
@@ -55,7 +56,7 @@ def patch(url, md5sum=None):
     return subprocess.run(["patch", "-Np1", "-i", local_filename]).returncode
 
 
-def wrap(install_dir):
+def wrap(install_dir, package):
     if not os.path.exists(install_dir):
         os.mkdir(install_dir)
     subprocess.run(["make", "install"])
@@ -67,14 +68,25 @@ def wrap(install_dir):
         archive.add("./")
     os.chdir("..")
 
+    with open("manifest.toml", "w") as f:
+        manifest = {
+                "metadata": {
+                    "name": package.name,
+                    "version": package.version
+                    },
+                "dependencies": package.dependencies,
+                }
+        toml.dump(manifest, f)
+
 
 class Common(templates.BaseManifest.BaseManifest):
-    def __init__(self, name, version, *args, **kwargs):
+    def __init__(self, name, version, dependencies=None, *args, **kwargs):
         templates.BaseManifest.BaseManifest.__init__(self)
         self.name = name
         self.version = version
         self.kwargs = kwargs
         self.install_dir = "./tmp"
+        self.dependencies = dependencies
 
     def fetch(self):
         if "fetch" in self.kwargs:
@@ -105,4 +117,4 @@ class Common(templates.BaseManifest.BaseManifest):
                                     else {})
 
     def wrap(self):
-        wrap(self.install_dir)
+        wrap(self.install_dir, self)

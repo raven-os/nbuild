@@ -24,4 +24,3 @@ def fmt_env(new_env):
     for key, value in new_env.items():
         env[key] = value
     return env
-

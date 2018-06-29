@@ -9,6 +9,7 @@ import templates.autotools
 class BuildManifest(templates.common.Common):
     def __init__(self):
         templates.common.Common.__init__(self, "coreutils", "8.29",
+                                         dependencies={"stable::sys-lib/libc": "^1.0.0"},
                                          fetch={"url": "http://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz",
                                                 "md5sum": "960cfe75a42c9907c71439f8eb436303"},
                                          compile={"jobs": 4,

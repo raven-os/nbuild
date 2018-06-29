@@ -55,12 +55,26 @@ def patch(url, md5sum=None):
     return subprocess.run(["patch", "-Np1", "-i", local_filename]).returncode
 
 
+def wrap(install_dir):
+    if not os.path.exists(install_dir):
+        os.mkdir(install_dir)
+    subprocess.run(["make", "install"])
+    # files = [os.path.join(dirpath, f)
+    #          for dirpath, _, filenames in os.walk(install_dir)
+    #          for f in filenames]
+    os.chdir(install_dir)
+    with tarfile.open("data.tar.gz", mode="w:gz") as archive:
+        archive.add(install_dir)
+    os.chdir("..")
+
+
 class Common(templates.BaseManifest.BaseManifest):
     def __init__(self, name, version, *args, **kwargs):
         templates.BaseManifest.BaseManifest.__init__(self)
         self.name = name
         self.version = version
         self.kwargs = kwargs
+        self.install_dir = "./tmp"
 
     def fetch(self):
         if "fetch" in self.kwargs:
@@ -89,3 +103,6 @@ class Common(templates.BaseManifest.BaseManifest):
         return templates.make.check(**self.kwargs["compile"]
                                     if "compile" in self.kwargs
                                     else {})
+
+    def wrap(self):
+        wrap(self.install_dir)

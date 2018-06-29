@@ -66,10 +66,9 @@ def main():
         os.makedirs("{}-{}".format(bm.name, bm.version))
     os.chdir("{}-{}".format(bm.name, bm.version))
 
-    run_cmds(bm, "fetch", "unpack", "patch", "configure", "compile", "check")
+    run_cmds(bm, "fetch", "unpack", "patch", "configure", "compile", "check", "wrap")
 
     os.chdir("..")
-    # shutil.rmtree("f{bm.name}-{bm.version}")
 
 
 if __name__ == "__main__":

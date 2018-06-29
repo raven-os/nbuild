@@ -62,8 +62,6 @@ def wrap(install_dir):
     # files = [os.path.join(dirpath, f)
     #          for dirpath, _, filenames in os.walk(install_dir)
     #          for f in filenames]
-    os.system("ls")
-    print(os.getcwd())
     os.chdir(install_dir)
     with tarfile.open("data.tar.gz", mode="w:gz") as archive:
         archive.add("./")

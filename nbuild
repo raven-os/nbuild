@@ -13,7 +13,7 @@ def safe_call(bm, method_name, err_callback):
         err_callback(e)
 
 
-def run_cmds(bm, *cmds):
+def run_cmds(bm, cmds):
     bm.to_save["base_path"] = os.getcwd()
     step_path = os.path.join(bm.to_save["base_path"], ".step")
 
@@ -57,6 +57,7 @@ def stop(bm, step_path, cmd, err=None):
 def main():
     parser = argparse.ArgumentParser(description='Compile packages from a Build Manifest.')
     parser.add_argument('manifests', nargs='+')
+    parser.add_argument("--no-check", action="store_true")
     args = parser.parse_args()
 
     build_dir = "build1"
@@ -79,8 +80,13 @@ def main():
         os.chdir("{}-{}".format(bm.name, bm.version))
         print("[+] Building", bm.name, "in", os.getcwd())
 
-        run_cmds(bm, "fetch", "unpack", "patch", "configure", "compile", "wrap")
+        cmds = ["fetch", "unpack", "patch", "configure", "compile"]
+        if not args.no_check:
+            cmds.append("check")
+        cmds.append("wrap")
 
+
+        run_cmds(bm, cmds)
         os.chdir(cur_path)
 
 

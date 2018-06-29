@@ -103,7 +103,12 @@ class Common(templates.BaseManifest.BaseManifest):
             return patch(**self.kwargs["patch"])
 
     def configure(self):
-        if "configure" in self.kwargs:
+        if "configure" not in self.kwargs:
+            self.kwargs["configure"] = {}
+            self.kwargs["configure"]["prefix"] = os.path.join(os.getcwd(), self.install_dir)
+            return templates.autotools.configure(**self.kwargs["configure"])
+        elif self.kwargs.configure is not None:
+            self.kwargs["configure"]["prefix"] = os.path.join(os.getcwd(), self.install_dir)
             return templates.autotools.configure(**self.kwargs["configure"])
 
     def compile(self):

@@ -8,4 +8,5 @@ class BuildManifest(templates.common.Common):
         templates.common.Common.__init__(self, "sed", "4.4",
                                          fetch={"url": "http://ftp.gnu.org/gnu/sed/sed-4.4.tar.xz",
                                                 "md5sum": "e0c583d4c380059abd818cd540fe6938"},
-                                         configure={"prefix": "/tools"})
+                                         compile={"jobs": 4},
+                                         check={"jobs": 4})

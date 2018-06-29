@@ -7,10 +7,7 @@ def fmt_args(cmd, *args, **kwargs):
     for key, value in kwargs.items():
         li = []
         if len(key) > 1:
-            var = ""
-            if not key.isupper():
-                var = "--"
-            var += "{}".format(key)
+            var = "{}".format(key)
             if value is not None:
                 var += "={}".format(value)
         else:

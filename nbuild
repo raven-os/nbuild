@@ -59,9 +59,11 @@ def main():
     parser.add_argument('manifests', nargs='+')
     args = parser.parse_args()
 
-    if not os.path.exists("build"):
-        os.makedirs("build")
-    os.chdir("build")
+    build_dir = "build1"
+
+    if not os.path.exists(build_dir):
+        os.makedirs(build_dir)
+    os.chdir(build_dir)
 
     for manifest_path in args.manifests:
         cur_path = os.getcwd()
@@ -77,7 +79,7 @@ def main():
         os.chdir("{}-{}".format(bm.name, bm.version))
         print("[+] Building", bm.name, "in", os.getcwd())
 
-        run_cmds(bm, "fetch", "unpack", "patch", "configure", "compile", "check", "wrap")
+        run_cmds(bm, "fetch", "unpack", "patch", "configure", "compile", "wrap")
 
         os.chdir(cur_path)
 

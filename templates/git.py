@@ -4,7 +4,6 @@ from . import helpers
 
 
 def fetch(url, **kwargs):
-    # subprocess.run(["rm", "-rf", url.split("/")[-1]])
     env = None
     if "env" in kwargs:
         env = helpers.fmt_env(kwargs["env"])

@@ -1,11 +1,10 @@
 import templates.git
 import templates.common
-import templates.make
-import templates.autotools
 
 
-class BuildManifest:
+class BuildManifest(templates.BaseManifest.BaseManifest):
     def __init__(self):
+        templates.BaseManifest.BaseManifest.__init__(self)
         self.name = "alpaca-fantom"
         self.version = "0.1.0"
 

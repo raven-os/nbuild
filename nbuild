@@ -3,6 +3,7 @@
 import sys
 import importlib
 import os
+import argparse
 
 
 def safe_call(bm, method_name, err_callback):
@@ -21,7 +22,7 @@ def run_cmds(bm, *cmds):
             step = f.readline()[:-1]
             if step != "" and step in cmds:
                 cmds = cmds[cmds.index(step):]
-                print("Starting at step {}".format(step))
+                print("[+] Starting at step {}".format(step))
                 bm.on_resume()
 
     for c in cmds:
@@ -29,15 +30,15 @@ def run_cmds(bm, *cmds):
         try:
             cmd = getattr(bm, c)
         except AttributeError:
-            print("Skipping step '{}'".format(c))
+            print("[+] Skipping step '{}'".format(c))
             continue
 
-        print("Executing '{}'".format(c))
+        print("[+] Executing '{}'".format(c))
         try:
             returncode = cmd()
             if isinstance(returncode, int) and returncode != 0 or \
                     isinstance(returncode, bool) and not returncode:
-                print("{} returned {}".format(c, returncode), file=sys.stderr)
+                print("[-] {} returned {}".format(c, returncode), file=sys.stderr)
                 stop(bm, step_path, c)
                 return
         except Exception as e:
@@ -54,22 +55,31 @@ def stop(bm, step_path, cmd, err=None):
 
 
 def main():
-    module = importlib.import_module(sys.argv[1]
-                                     .replace(".py", "")
-                                     .replace("/", "."),
-                                     package=".")
-    bm = module.BuildManifest()
+    parser = argparse.ArgumentParser(description='Compile packages from a Build Manifest.')
+    parser.add_argument('manifests', nargs='+')
+    args = parser.parse_args()
+
     if not os.path.exists("build"):
         os.makedirs("build")
     os.chdir("build")
-    if not os.path.exists("{}-{}".format(bm.name, bm.version)):
-        os.makedirs("{}-{}".format(bm.name, bm.version))
-    os.chdir("{}-{}".format(bm.name, bm.version))
 
-    run_cmds(bm, "fetch", "unpack", "patch", "configure", "compile", "check")
+    for manifest_path in args.manifests:
+        cur_path = os.getcwd()
 
-    os.chdir("..")
-    # shutil.rmtree("f{bm.name}-{bm.version}")
+        module = importlib.import_module(manifest_path
+                                         .replace(".py", "")
+                                         .replace("/", "."),
+                                         package=".")
+        bm = module.BuildManifest()
+
+        if not os.path.exists("{}-{}".format(bm.name, bm.version)):
+            os.makedirs("{}-{}".format(bm.name, bm.version))
+        os.chdir("{}-{}".format(bm.name, bm.version))
+        print("[+] Building", bm.name, "in", os.getcwd())
+
+        run_cmds(bm, "fetch", "unpack", "patch", "configure", "compile", "check")
+
+        os.chdir(cur_path)
 
 
 if __name__ == "__main__":

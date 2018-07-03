@@ -1,82 +1,65 @@
-# nbuild
-Nest Build System
+# nuild - Nest's Package Builder
 
-## Prerequisites
-python3
-
-
-### Using it
-
-`nbuild` takes a python file as its first parameter, this file is a `Build Manifest`, it is a file that describes the steps to be taken, from retrieving the source files to achieving a fully built program.
+`nbuild` is Nest's package builder. It takes a `Build Manifest` (a python file) that describes the steps to be taken to build the package, from retrieving the source files to achieving a fully built program.
 
 There are in total 7 steps:
 ```
-- Fetch     -> Fetching the needed sources
-- Unpack    -> Extracting if an archive was fetched
-- Patch     -> Applying the potential needed patches
+- Fetch      -> Fetching the needed sources
+- Unpack     -> Extracting the sources
+- Patch      -> Applying potentially patches
 - Configure  -> Configuring the build
-- Compile   -> Compiling the source code
-- Check     -> Running the test suites
-- Wrap      -> Creating a pair of a Package Manifest and an archive of the files to install
+- Compile    -> Compiling the source code
+- Check      -> Running the test suites
+- Wrap       -> Creating all necessary files to install the package (data and install manifest)
 ```
-The build manifest file must contain a class named `BuildManifest`, itself optionally containing a function for each step, and with a constructor with no parameters.
-The class must inherit from the class `templates.BaseManifest.Manifest`.
-You can omit functions in the manifest, as some are not always needed.
+
+The `Build Manifest` can inherits existing templates to reuse some of their steps. For example, `CoreutilsManifest` uses `GnuTemplate`, which in turns uses `FetchTarballTemplate` to retrieve the source code (step `Fetch` and `Unpack`) and `AutotoolsTemplate`. `AutotoolsTemplate` uses `AutoconfTemplate` and `MakeTemplate` to provide the steps `Configure`, `Compile`, `Check` and `Wrap`. The step `Patch` is left empty.
+
+All steps are then done in order.
+
+## Prerequisites
+
+* python3
+
+To install nbuild's dependencies, run
+
+```bash
+pip install -r requirements.txt
+```
+
+**Warning: Nest-build does NOT provide any kind of isolation**.
+
+If the manifest is ill-formed, your main system may be damaged. That's why we recommend the use of our docker image: `ravenos/nbuild`.
 
 ### Examples
-```python3
-import templates.BaseManifest
+
+Here is `coreutil`'s `Build Manifest`. More can be found in the `example/` folder.
+
+```python
+#!/usr/bin/env python3
+
+from nbuild.manifest import BuildManifest
+from templates.gnu import GnuTemplate
 
 
-class BuildManifest(templates.BaseManifest.BaseManifest):
+CATEGORY = "sys-bin"
+NAME = "coreutils"
+VERSION = "8.29.0"
+RUN_DEPENDENCIES = {
+    "stable::sys-lib/libc": ">=2.27.0"
+}
+
+
+class CoreutilsManifest(GnuTemplate, BuildManifest):
     def __init__(self):
-        self.name = "alpaca-fantom"
-        self.version = "0.1.0"
-  
-    def fetch(self):
-        pass
-  
-    def wrap(self):
-        pass
+        BuildManifest.__init__(self, CATEGORY, NAME, VERSION, RUN_DEPENDENCIES)
+        GnuTemplate.__init__(
+            self,
+            fetch={
+                "url": "http://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz",
+                "md5sum": "960cfe75a42c9907c71439f8eb436303",
+            },
+        )
+
+CoreutilsManifest().build()
 ```
-
-To reduce boilerplate in manifests, some templates are provided:
-`templates.common` and `templates.autotools` for  packages that use autotools
- 
-```python3
-import os
-import templates.common
-
-
-class BuildManifest(templates.BaseManifest.BaseManifest):
-    def __init__(self):
-        templates.BaseManifest.BaseManifest.__init__(self)
-        self.name = "sed"
-        self.version = "4.4"
-
-    def fetch(self):
-        self.filename = templates.common.fetch("http://ftp.gnu.org/gnu/sed/sed-4.4.tar.xz",
-                                               md5sum="e0c583d4c380059abd818cd540fe6938")
-
-    def unpack(self):
-        templates.common.unpack(self.filename)
-        os.chdir("sed-4.4")
-
-    def wrap(self):
-        pass
-```
-
-`templates.common` defines a class `Common`, that inherits from `BaseManifest`, and implement multiples steps, and which constructor takes as parameters the arguments to the steps
-
-```python3
-import templates.common
-import templates.make
-import templates.autotools
-
-
-class BuildManifest(templates.common.Common):
-    def __init__(self):
-        templates.common.Common.__init__(self, "sed", "4.4",
-                                         fetch={"url": "http://ftp.gnu.org/gnu/sed/sed-4.4.tar.xz",
-                                                "md5sum": "e0c583d4c380059abd818cd540fe6938"},
-                                         configure={"prefix": "/tools"})

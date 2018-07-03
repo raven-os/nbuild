@@ -1,12 +1,12 @@
-import subprocess
+#!/usr/bin/env python3
 
-from . import helpers
+from nbuild.log import *
+from nbuild.cmd import exec
 
 
-def fetch(url, **kwargs):
-    env = None
-    if "env" in kwargs:
-        env = helpers.fmt_env(kwargs["env"])
-        kwargs.pop("env")
-    cmd = helpers.fmt_args(["git", "clone", url], **kwargs)
-    return subprocess.run(cmd, env=env).returncode
+class GitTemplate:
+    def __init__(self, url):
+        self.url = url
+
+    def fetch(self):
+        exec(["git", "clone", self.url])

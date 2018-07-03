@@ -1,21 +1,8 @@
-import subprocess
+#!/usr/bin/env python3
 
-from . import helpers
-
-
-def compile(*args, **kwargs):
-    env = None
-    if "env" in kwargs:
-        env = helpers.fmt_env(kwargs["env"])
-        kwargs.pop("env")
-    cmd = helpers.fmt_args(["make"], *args, **kwargs)
-    return subprocess.run(cmd, env=env).returncode
+from nbuild.cmd import exec
 
 
-def check(*args, **kwargs):
-    env = None
-    if "env" in kwargs:
-        env = helpers.fmt_env(kwargs["env"])
-        kwargs.pop("env")
-    cmd = helpers.fmt_args(["make", "check"], *args, **kwargs)
-    return subprocess.run(cmd, env=env).returncode
+class MakeTemplate:
+    def compile(self):
+        exec(["make", "all"])

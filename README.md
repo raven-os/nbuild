@@ -33,7 +33,7 @@ If the manifest is ill-formed, your main system may be damaged. That's why we re
 
 ### Examples
 
-Here is `coreutil`'s `Build Manifest`. More can be found in the `example/` folder.
+Here is `coreutil`'s `Build Manifest`. More can be found in the `examples/` folder.
 
 ```python
 #!/usr/bin/env python3

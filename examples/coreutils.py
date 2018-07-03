@@ -23,7 +23,4 @@ class CoreutilsManifest(GnuTemplate, BuildManifest):
             },
         )
 
-    def wrap(self):
-        pass
-
 CoreutilsManifest().build()

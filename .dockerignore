@@ -1,0 +1,8 @@
+/build/
+/packages/
+/example/
+__pycache__
+Dockerfile
+.dockerignore
+.gitignore
+README.md

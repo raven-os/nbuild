@@ -31,6 +31,12 @@ pip install -r requirements.txt
 
 If the manifest is ill-formed, your main system may be damaged. That's why we recommend the use of our docker image: `ravenos/nbuild`.
 
+Example:
+
+```
+docker run -v $PWD/build:/build -v $PWD/packages:/packages -v $PWD/examples:/manifests ravenos/nbuild /manifests/sed.py
+```
+
 ### Examples
 
 Here is `coreutil`'s `Build Manifest`. More can be found in the `example/` folder.

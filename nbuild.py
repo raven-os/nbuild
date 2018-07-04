@@ -4,6 +4,7 @@ import sys
 import importlib.util
 import os
 import nbuild.args
+from nbuild.log import *
 
 
 def main():
@@ -19,6 +20,15 @@ def main():
             "build_manifest",
             manifest_path
         )
+
+        if spec is None:
+            flog(
+                "Failed to load Build Manifest "
+                "located at path \"{}\""
+                .format(manifest_path)
+            )
+            exit(1)
+
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 

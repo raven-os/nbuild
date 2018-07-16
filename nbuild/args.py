@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
+# -*- coding: utf-8 -*-
 
 import argparse
 
@@ -12,25 +13,11 @@ def parse_args():
     global nbuild_args
 
     nbuild_parser = argparse.ArgumentParser(
-        description='Compile packages from a Build Manifest.'
+        description='Compiles packages from a Build Manifest.'
     )
     nbuild_parser.add_argument(
         'manifests',
         nargs='*'
-    )
-    nbuild_parser.add_argument(
-        '--build-dir',
-        type=str,
-        metavar='<directory>',
-        default='build',
-        help='Build the packages into <directory>'
-    )
-    nbuild_parser.add_argument(
-        '--pkg-dir',
-        type=str,
-        metavar='<directory>',
-        default='packages',
-        help='Place the output files into <directory>'
     )
     nbuild_parser.add_argument(
         '-v',
@@ -43,10 +30,8 @@ def parse_args():
 
 
 def get_args():
-    global nbuild_args
     return nbuild_args
 
 
-def print_help():
-    global nbuild_parser
-    nbuild_parser.print_help()
+def get_parser():
+    return nbuild_parser

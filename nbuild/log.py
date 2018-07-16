@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
+# -*- coding: utf-8 -*-
 
 from termcolor import cprint
 
@@ -38,5 +39,5 @@ def elog(*args, indent=True):
     print(*args)
 
 
-def flog(*args):
-    cprint("[-] {}".format(*args), "red", attrs=['bold'])
+def flog(args):
+    cprint(f"[-] {args}", "red", attrs=['bold'])

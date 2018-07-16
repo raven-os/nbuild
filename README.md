@@ -1,25 +1,18 @@
-# nuild - Nest's Package Builder
+# nbuild - Nest's Package Builder
 
-`nbuild` is Nest's package builder. It takes a `Build Manifest` (a python file) that describes the steps to be taken to build the package, from retrieving the source files to achieving a fully built program.
+`nbuild` is Nest's package builder. It takes a `Build Manifest` (a python file) that describes the steps to be taken to build one or more packages, from retrieving the source files to achieving a fully built program.
 
-There are in total 7 steps:
-```
-- Fetch      -> Fetching the needed sources
-- Unpack     -> Extracting the sources
-- Patch      -> Applying potentially patches
-- Configure  -> Configuring the build
-- Compile    -> Compiling the source code
-- Check      -> Running the test suites
-- Wrap       -> Creating all necessary files to install the package (data and install manifest)
-```
+Examples can be found in [nbuild-manifests](https://github.com/raven-os/nbuild-manifests).
 
-The `Build Manifest` can inherits existing templates to reuse some of their steps. For example, `CoreutilsManifest` uses `GnuTemplate`, which in turns uses `FetchTarballTemplate` to retrieve the source code (step `Fetch` and `Unpack`) and `AutotoolsTemplate`. `AutotoolsTemplate` uses `AutoconfTemplate` and `MakeTemplate` to provide the steps `Configure`, `Compile`, `Check` and `Wrap`. The step `Patch` is left empty.
-
-All steps are then done in order.
+`nbuild` places it's content in 4 seperate folders:
+    * `/usr/nbuild/downloads/`: All downloads are placed there so they can be re-used when rebuilding the same package
+    * `/usr/nbuild/sources/`: Packages are extracted and build there.
+    * `/usr/nbuild/installs/`: Packages are installed in this folder before being compressed
+    * `/usr/nbuild/packages`: The resulting package (`data.tar.gz` and `manifest.toml`) is placed there when the operation is successfully completed
 
 ## Prerequisites
 
-* python3
+* python3.6+
 
 To install nbuild's dependencies, run
 
@@ -39,33 +32,28 @@ docker run -v $PWD/build:/build -v $PWD/packages:/packages -v $PWD/examples:/man
 
 ### Examples
 
-Here is `coreutil`'s `Build Manifest`. More can be found in the `examples/` folder.
+Here is an example manifest for a basic C project based on GNU's autotools.
 
 ```python
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
+# -*- coding: utf-8 -*-
+"""
+Example of a build manifest
+"""
 
-from nbuild.manifest import BuildManifest
-from templates.gnu import GnuTemplate
-
-
-CATEGORY = "sys-bin"
-NAME = "coreutils"
-VERSION = "8.29.0"
-RUN_DEPENDENCIES = {
-    "stable::sys-lib/libc": ">=2.27.0"
-}
+from nbuild.stdenv.package import package
+from nbuild.stdenv.fetch import fetch_url
+from nbuild.stdenv.autotools import build_autotools_package
 
 
-class CoreutilsManifest(GnuTemplate, BuildManifest):
-    def __init__(self):
-        BuildManifest.__init__(self, CATEGORY, NAME, VERSION, RUN_DEPENDENCIES)
-        GnuTemplate.__init__(
-            self,
-            fetch={
-                "url": "http://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz",
-                "md5sum": "960cfe75a42c9907c71439f8eb436303",
-            },
-        )
-
-CoreutilsManifest().build()
+@package(
+    id="stable::example/example#1.0.0",
+)
+def build_libc():
+    build_autotools_package(
+        fetch=lambda: fetch_url(
+            url=f"https://example.com/myproject.tar.gz",
+            sha256="729e344a01e52c822bdfdec61e28d6eda02658d2e7d2b80a9b9029f41e212dde",
+        ),
+    )
 ```

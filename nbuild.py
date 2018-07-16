@@ -1,38 +1,38 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
+# -*- coding: utf-8 -*-
 
 import sys
 import importlib.util
 import os
-import nbuild.args
-from nbuild.log import *
+from nbuild.args import parse_args, get_args, get_parser
+from nbuild.log import flog
 
 
 def main():
-    nbuild.args.parse_args()
+    parse_args()
 
-    if len(nbuild.args.get_args().manifests) == 0:
-        nbuild.args.print_help()
+    if len(get_args().manifests) == 0:
+        get_parser().print_help()
         exit(0)
 
-    exec_path = os.getcwd()
-    for manifest_path in nbuild.args.get_args().manifests:
+    cwd = os.getcwd()
+    for manifest_path in get_args().manifests:
         spec = importlib.util.spec_from_file_location(
             "build_manifest",
             manifest_path
         )
 
-        if spec is None:
+        if not spec:
             flog(
                 "Failed to load Build Manifest "
-                "located at path \"{}\""
-                .format(manifest_path)
+                f"located at path \"{manifest_path}\""
             )
             exit(1)
 
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
-        os.chdir(exec_path)
+        os.chdir(cwd)
 
 
 if __name__ == "__main__":

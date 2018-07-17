@@ -38,7 +38,7 @@ Here is an example manifest for a basic C project based on GNU's autotools.
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Example of a build manifest
+Example of a build manifest.
 """
 
 from nbuild.stdenv.package import package
@@ -47,12 +47,12 @@ from nbuild.stdenv.autotools import build_autotools_package
 
 
 @package(
-    id="stable::example/example#1.0.0",
+    id="stable::sys-lib/helloworld#1.0.0",
 )
-def build_libc():
+def build_helloworld():
     build_autotools_package(
         fetch=lambda: fetch_url(
-            url=f"https://example.com/myproject.tar.gz",
+            url=f"https://example.com/helloworld.tar.gz",
             sha256="729e344a01e52c822bdfdec61e28d6eda02658d2e7d2b80a9b9029f41e212dde",
         ),
     )

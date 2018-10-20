@@ -86,9 +86,9 @@ def package(id: str, build_dependencies={}, run_dependencies={}):
             gnuflags = '-O2 -s -m64 -mtune=generic'
 
             # Pre-processor
-            os.environ['CPP'] = f'{os.environ["TARGET"]}-cpp'
-            os.environ['HOSTCPP'] = f'{os.environ["HOST"]}-cpp'
-            os.environ['CPPFLAGS'] = gnuflags
+            # os.environ['CPP'] = f'{os.environ["TARGET"]}-cpp'
+            # os.environ['HOSTCPP'] = f'{os.environ["HOST"]}-cpp'
+            # os.environ['CPPFLAGS'] = gnuflags
 
             # C Compilers
             os.environ['CC'] = f'{os.environ["TARGET"]}-gcc'
@@ -105,14 +105,14 @@ def package(id: str, build_dependencies={}, run_dependencies={}):
             os.environ['HOSTAS'] = f'{os.environ["HOST"]}-as'
             os.environ['ASFLAGS'] = gnuflags
 
-            # Archiver
-            os.environ['AR'] = f'{os.environ["TARGET"]}-ar'
-            os.environ['HOSTAR'] = f'{os.environ["HOST"]}-ar'
+            # # Archiver
+            # os.environ['AR'] = f'{os.environ["TARGET"]}-ar'
+            # os.environ['HOSTAR'] = f'{os.environ["HOST"]}-ar'
 
             # Linker
-            os.environ['LD'] = f'{os.environ["TARGET"]}-ld'
-            os.environ['HOSTLD'] = f'{os.environ["HOST"]}-ld'
-            os.environ['LDFLAGS'] = gnuflags
+            ###os.environ['LD'] = f'{os.environ["TARGET"]}-ld'
+            ###os.environ['HOSTLD'] = f'{os.environ["HOST"]}-ld'
+            ###os.environ['LDFLAGS'] = gnuflags
 
             # Misc
             # FIXME: remove /tools/bin from PATH

@@ -17,8 +17,8 @@ def build_autotools_package(
     patch=apply_patches,
     configure=do_configure,
     compile=do_make,
-    check=lambda: do_make(target="check", fail_ok=True),
-    install=lambda: do_make(target="install"),
+    check=lambda: do_make(target = "check", fail_ok = True),
+    install=lambda: do_make(target = "install"),
 ):
     package = get_package()
 

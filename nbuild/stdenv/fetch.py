@@ -5,6 +5,7 @@ import os
 import hashlib
 import requests
 from urllib.parse import urlparse
+import urllib.request
 from nbuild.log import wlog, ilog, clog, flog
 from nbuild.stdenv.package import get_package
 
@@ -34,10 +35,13 @@ def fetch_url(
 
     if not _check_file(path, md5, sha1, sha256):
         ilog(f"Fetching {url}")
-        req = requests.get(url, stream=True)
-        with open(path, 'wb') as file:
-            for chunk in req.iter_content(chunk_size=4096):
-                file.write(chunk)
+        if url.startswith("http"):
+            download_direct(url, path)
+        elif url.startswith("ftp"):
+            download_ftp(url, path)
+        else:
+            flog(f"Unknown protocol to download file from url {url}")
+            exit(1)
         clog(f"Fetch done. Stored at {path}")
         if not _check_file(path, md5, sha1, sha256):
             flog(
@@ -51,15 +55,29 @@ def fetch_url(
         clog(f"Using cache at {path}")
 
 
+def download_direct(url, path):
+        req = requests.get(url, stream=True)
+        with open(path, 'wb') as file:
+            for chunk in req.iter_content(chunk_size=4096):
+                file.write(chunk)
+
+
+def download_ftp(url, path):
+    with urllib.request.urlopen(url) as response, \
+         open(path, 'wb') as out_file:
+        data = response.read()
+        out_file.write(data)
+
+
 def _check_file(path, md5, sha1, sha256):
     if os.path.exists(path):
         out = True
         if md5 is not None:
             out &= _check_md5(path, md5)
         if sha1 is not None:
-            out &= _check_sha1(path, md5)
+            out &= _check_sha1(path, sha1)
         if sha256 is not None:
-            out &= _check_sha256(path, md5)
+            out &= _check_sha256(path, sha256)
         return out
     else:
         return False

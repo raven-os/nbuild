@@ -49,7 +49,6 @@ def fetch_url(
                 "Please verify the signature(s) in the build manifest "
                 "and the authenticity of the given link."
             )
-            print(f"Url: {url}\nmd5: {md5}")
             exit(1)
     else:
         clog(f"Using cache at {path}")

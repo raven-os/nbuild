@@ -4,7 +4,7 @@
 import os
 from nbuild.log import ilog
 from nbuild.pushd import pushd
-from nbuild.stdenv.package import Package, get_package
+from nbuild.stdenv.package import get_package
 from nbuild.stdenv.extract import extract_tarballs
 from nbuild.stdenv.autotools.make import do_make
 from nbuild.stdenv.patch import apply_patches

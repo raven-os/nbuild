@@ -34,10 +34,13 @@ class Package():
             self.version,
         )
 
-        self.download_dir = os.path.join('/usr/nbuild/downloads/', dir)
-        self.source_dir = os.path.join('/usr/nbuild/sources/', dir)
-        self.install_dir = os.path.join('/usr/nbuild/installs/', dir)
-        self.package_dir = os.path.join('/usr/nbuild/packages/', dir)
+        cwd = os.getcwd()
+        cache_dir = get_args().cache_dir
+        output_dir = get_args().output_dir
+        self.download_dir = os.path.join(cwd, cache_dir, 'downloads/', dir)
+        self.source_dir = os.path.join(cwd, cache_dir, 'sources/', dir)
+        self.install_dir = os.path.join(cwd, cache_dir, 'installs/', dir)
+        self.package_dir = os.path.join(cwd, output_dir, dir)
 
         # Erase old content of previous builds
         if os.path.exists(self.source_dir):

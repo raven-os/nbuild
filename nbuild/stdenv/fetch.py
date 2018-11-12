@@ -35,7 +35,7 @@ def fetch_url(
     if not _check_file(path, md5, sha1, sha256):
         ilog(f"Fetching {url}")
         req = requests.get(url, stream=True)
-        with open(path, 'wb') as file:
+        with open(path, 'wb+') as file:
             for chunk in req.iter_content(chunk_size=4096):
                 file.write(chunk)
         clog(f"Fetch done. Stored at {path}")

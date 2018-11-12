@@ -1,11 +1,8 @@
-#!/usr/bin/env python3.6
-# -*- coding: utf-8 -*-
-
 import os
 import hashlib
 import requests
 from urllib.parse import urlparse
-import urllib.request
+import ftplib
 from nbuild.log import wlog, ilog, clog, flog
 from nbuild.stdenv.package import get_package
 
@@ -39,7 +36,7 @@ def fetch_url(
         if url_object.scheme == 'http' or url_object.scheme == 'https':
             download_direct(url, path)
         elif url_object.scheme == ('ftp'):
-            download_ftp(url, path)
+            download_ftp(url_object, path)
         else:
             flog(f"Unknown protocol to download file from url {url}")
             exit(1)
@@ -62,11 +59,13 @@ def download_direct(url, path):
                 file.write(chunk)
 
 
-def download_ftp(url, path):
-    with urllib.request.urlopen(url) as response, \
-         open(path, 'wb') as out_file:
-        data = response.read()
-        out_file.write(data)
+def download_ftp(url_object, path):
+    ftp = ftplib.FTP(url_object.netloc)
+    ftp.login()
+    with open(path, 'wb') as out_file:
+        ftp.retrbinary(f'RETR {url_object.path}',
+                       lambda data: out_file.write(data),
+                       blocksize=4096)
 
 
 def _check_file(path, md5, sha1, sha256):

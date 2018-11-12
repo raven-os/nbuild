@@ -34,7 +34,7 @@ def fetch_url(
     if not _check_file(path, md5, sha1, sha256):
         ilog(f"Fetching {url}")
         if url_object.scheme == 'http' or url_object.scheme == 'https':
-            download_direct(url, path)
+            download_http(url, path)
         elif url_object.scheme == ('ftp'):
             download_ftp(url_object, path)
         else:
@@ -52,7 +52,7 @@ def fetch_url(
         clog(f"Using cache at {path}")
 
 
-def download_direct(url, path):
+def download_http(url, path):
         req = requests.get(url, stream=True)
         with open(path, 'wb') as file:
             for chunk in req.iter_content(chunk_size=4096):

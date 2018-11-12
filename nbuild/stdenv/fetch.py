@@ -25,9 +25,10 @@ def fetch_url(
 ):
     package = get_package()
 
+    url_object = urlparse(url)
     path = os.path.join(
         package.download_dir,
-        os.path.basename(urlparse(url).path)
+        os.path.basename(url_object.path)
     )
 
     if not sha256:
@@ -35,9 +36,9 @@ def fetch_url(
 
     if not _check_file(path, md5, sha1, sha256):
         ilog(f"Fetching {url}")
-        if url.startswith("http"):
+        if url_object.scheme == 'http' or url_object.scheme == 'https':
             download_direct(url, path)
-        elif url.startswith("ftp"):
+        elif url_object.scheme == ('ftp'):
             download_ftp(url, path)
         else:
             flog(f"Unknown protocol to download file from url {url}")

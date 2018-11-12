@@ -16,6 +16,18 @@ def parse_args():
         description='Compiles packages from a Build Manifest.'
     )
     nbuild_parser.add_argument(
+        '-o',
+        '--output-dir',
+        default='./packages/',
+        help='Output directory for built packages',
+    )
+    nbuild_parser.add_argument(
+        '-c',
+        '--cache-dir',
+        default='./cache/',
+        help='Cache directory used when downloading and building packages',
+    )
+    nbuild_parser.add_argument(
         'manifests',
         nargs='*'
     )

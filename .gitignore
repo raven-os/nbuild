@@ -103,5 +103,6 @@ ENV/
 # Outputs
 /packages/
 /build/
+/cache/
 
 TODO

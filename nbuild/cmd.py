@@ -5,7 +5,6 @@ import os
 import subprocess
 from copy import deepcopy
 from textwrap import dedent
-from nbuild.log import dlog
 from nbuild.args import nbuild_args
 from nbuild.log import ilog, dlog, flog
 

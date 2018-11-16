@@ -63,9 +63,11 @@ def download_ftp(url_object, path):
     ftp = ftplib.FTP(url_object.netloc)
     ftp.login()
     with open(path, 'wb') as out_file:
-        ftp.retrbinary(f'RETR {url_object.path}',
-                       lambda data: out_file.write(data),
-                       blocksize=4096)
+        ftp.retrbinary(
+                f'RETR {url_object.path}',
+                lambda data: out_file.write(data),
+                blocksize=4096,
+        )
 
 
 def _check_file(path, md5, sha1, sha256):

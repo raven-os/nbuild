@@ -18,13 +18,13 @@ def parse_args():
     nbuild_parser.add_argument(
         '-o',
         '--output-dir',
-        default='./packages/',
+        default='packages/',
         help='Output directory for built packages',
     )
     nbuild_parser.add_argument(
         '-c',
         '--cache-dir',
-        default='./cache/',
+        default='cache/',
         help='Cache directory used when downloading and building packages',
     )
     nbuild_parser.add_argument(

@@ -5,7 +5,6 @@ import os
 import subprocess
 from copy import deepcopy
 from textwrap import dedent
-from nbuild.log import dlog
 from nbuild.args import nbuild_args
 from nbuild.log import ilog, dlog, flog
 
@@ -27,8 +26,8 @@ def cmd(
     new_env = deepcopy(os.environ)
     new_env.update(env)
 
-    ilog(cmd)
     if nbuild_args.verbose >= 1:
+        ilog(cmd)
         dlog(f"Working directory: {os.getcwd()}")
 
         if nbuild_args.verbose >= 2:

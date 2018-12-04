@@ -60,7 +60,7 @@ class Package():
         return self.id
 
 
-def package(id: str, build_dependencies={}, run_dependencies={}):
+def package(id: str, build_dependencies=[], run_dependencies=[]):
     package = Package(id, run_dependencies)
 
     global _current_package

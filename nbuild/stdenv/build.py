@@ -21,7 +21,7 @@ class Build():
         self.build_dir = os.path.join(cwd, cache_dir, 'builds/', self.name)
 
     def __str__(self):
-        self.name
+        return self.name
 
     def queue_package(self, package):
         self.packages += [package]

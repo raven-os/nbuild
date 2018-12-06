@@ -6,6 +6,7 @@ import importlib.util
 import os
 from nbuild.args import parse_args, get_args, get_parser
 from nbuild.log import flog
+from nbuild.stdenv.build import Build, current_build, set_current_build
 
 
 def main():
@@ -29,8 +30,10 @@ def main():
             )
             exit(1)
 
+        set_current_build(Build())
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
+        current_build().build()
 
         os.chdir(cwd)
 

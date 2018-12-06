@@ -26,8 +26,8 @@ def cmd(
     new_env = deepcopy(os.environ)
     new_env.update(env)
 
-    ilog(cmd)
     if nbuild_args.verbose >= 1:
+        ilog(cmd)
         dlog(f"Working directory: {os.getcwd()}")
 
         if nbuild_args.verbose >= 2:

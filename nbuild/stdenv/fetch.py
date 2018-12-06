@@ -4,7 +4,7 @@ import requests
 from urllib.parse import urlparse
 import ftplib
 from nbuild.log import wlog, ilog, clog, flog
-from nbuild.stdenv.package import get_package
+from nbuild.stdenv.build import current_build
 
 
 def fetch_urls(
@@ -20,7 +20,7 @@ def fetch_url(
     sha1=None,
     sha256=None,
 ):
-    package = get_package()
+    package = current_build().current_package
 
     url_object = urlparse(url)
     path = os.path.join(

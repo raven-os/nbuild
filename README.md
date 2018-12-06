@@ -6,7 +6,7 @@ Examples can be found in the [nbuild-manifests](https://github.com/raven-os/nbui
 
 `nbuild` places it's content in 4 seperate folders:
   * `./cache/downloads/`: All downloads are placed there so they can be re-used when rebuilding the same package
-  * `./cache/sources/`: Packages are extracted and build there.
+  * `./cache/builds/`: Packages are extracted and built there.
   * `./cache/installs/`: Packages are installed in this folder before being compressed
   * `./packages/`: The resulting package (`data.tar.gz` and `manifest.toml`) is placed there when the operation is successfully completed.
 

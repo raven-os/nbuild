@@ -5,9 +5,9 @@ from nbuild.cmd import cmd
 
 
 def do_make(
-    binary="make",
-    folder=".",
-    target="",
+    binary='make',
+    folder='.',
+    target='',
     extra_args=[],
     **kwargs,
 ):

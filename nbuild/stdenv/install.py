@@ -3,11 +3,11 @@
 
 import os
 import shutil
-from nbuild.stdenv.package import get_package
+from nbuild.stdenv.build import current_build
 
 
 def make_keeper(dest):
-    package = get_package()
+    package = current_build().current_package
     dest = f'{package.install_dir}/{dest}/'
     keeper = f'{dest}/.nestkeep'
     os.makedirs(dest, exist_ok=True)
@@ -15,7 +15,7 @@ def make_keeper(dest):
 
 
 def install_file(source, dest, chmod=0o644):
-    package = get_package()
+    package = current_build().current_package
     dest = f'{package.install_dir}/{dest}'
 
     # Create parent directory

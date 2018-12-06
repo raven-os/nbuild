@@ -5,13 +5,13 @@ import os
 from glob import glob
 from nbuild.log import clog
 from nbuild.cmd import cmd
-from nbuild.stdenv.package import get_package
+from nbuild.stdenv.build import current_build
 
 
 def apply_patches(
     patches=None,
 ):
-    package = get_package()
+    package = current_build().current_package
 
     if patches is None:
         patches = glob(f'{package.download_dir}/*.patch')

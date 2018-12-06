@@ -4,7 +4,7 @@
 import os
 from nbuild.log import ilog
 from nbuild.pushd import pushd
-from nbuild.stdenv.package import get_package
+from nbuild.stdenv.build import current_build
 from nbuild.stdenv.extract import extract_tarballs
 from nbuild.stdenv.autotools.make import do_make
 from nbuild.stdenv.patch import apply_patches
@@ -20,28 +20,35 @@ def build_autotools_package(
     check=lambda: do_make(target = "check", fail_ok = True),
     install=lambda: do_make(target = "install"),
 ):
-    package = get_package()
+    package = current_build().current_package
 
     ilog("Step 1/7: Fetch", indent=False)
-    fetch()
+    if fetch is not None:
+        fetch()
 
     ilog("Step 2/7: Extract", indent=False)
-    extract()
+    if extract is not None:
+        extract()
 
     ilog("Step 3/7: Patch", indent=False)
-    patch()
+    if patch is not None:
+        patch()
 
-    os.makedirs('build')
+    os.makedirs('build', exist_ok=True)
     with pushd('build'):
         ilog("Step 4/7: Configure", indent=False)
-        configure()
+        if configure is not None:
+            configure()
 
         ilog("Step 5/7: Compile", indent=False)
-        compile()
+        if compile is not None:
+            compile()
 
         ilog("Step 6/7: Check", indent=False)
-        check()
+        if check is not None:
+            check()
 
         os.environ['DESTDIR'] = package.install_dir
         ilog("Step 7/7: Install", indent=False)
-        install()
+        if install is not None:
+            install()

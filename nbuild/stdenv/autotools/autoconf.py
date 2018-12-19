@@ -8,14 +8,11 @@ from nbuild.stdenv.build import current_build
 
 def do_configure(
     binary='../configure',
-    prefix=None,
+    prefix='/usr',
     sysconfdir='/etc',
     localstatedir='/var',
     extra_configure_flags=[],
 ):
-    package = current_build().current_package
-    if prefix is None:
-        prefix = package.install_dir + '/usr'
     cmd(f'''
         {binary} \
             --build={os.environ['TARGET']} \

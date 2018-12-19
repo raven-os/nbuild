@@ -6,6 +6,7 @@ import toml
 import shutil
 import tarfile
 from os import makedirs
+from datetime import datetime
 from multiprocessing import cpu_count
 from nbuild.log import ilog, dlog
 from nbuild.args import get_args
@@ -15,8 +16,15 @@ from nbuild.stdenv.build import current_build
 
 
 class Package():
-    def __init__(self, package_id: str, builder, run_dependencies={}):
+    def __init__(
+        self,
+        package_id: str,
+        description: str,
+        builder,
+        run_dependencies={},
+    ):
         self.id = package_id
+        self.description = description.replace('\n', ' ').strip()
         self.repository = package_id.split('::')[0]
         self.category = package_id.split('::')[1].split('/')[0]
         self.name = package_id.split('/')[1].split('#')[0]
@@ -130,12 +138,14 @@ class Package():
         toml_path = os.path.join(self.package_dir, 'manifest.toml')
         with open(toml_path, "w") as filename:
             manifest = {
-                "metadata": {
-                    "name": self.name,
-                    "category": self.category,
-                    "version": self.version
+                'metadata': {
+                    'name': self.name,
+                    'category': self.category,
+                    'version': self.version,
+                    'description': self.description,
+                    'created_at': datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
                 },
-                "dependencies": self.run_dependencies,
+                'dependencies': self.run_dependencies,
             }
             toml.dump(manifest, filename)
 
@@ -143,10 +153,10 @@ class Package():
         ilog(f"Output placed in {self.package_dir}")
 
 
-def package(id: str, build_dependencies={}, run_dependencies={}):
+def package(id: str, description, build_dependencies={}, run_dependencies={}):
 
     def register_package(builder):
-        package = Package(id, builder, run_dependencies)
+        package = Package(id, description, builder, run_dependencies)
         current_build().queue_package(package)
 
     return register_package

@@ -153,7 +153,7 @@ class Package():
         ilog(f"Output placed in {self.package_dir}")
 
 
-def package(id: str, description, build_dependencies={}, run_dependencies={}):
+def package(id: str, description: str, build_dependencies={}, run_dependencies={}):
 
     def register_package(builder):
         package = Package(id, description, builder, run_dependencies)

@@ -136,7 +136,7 @@ class Package():
 
         ilog("Creating manifest.toml", indent=False)
         toml_path = os.path.join(self.package_dir, 'manifest.toml')
-        with open(toml_path, "w") as filename:
+        with open(toml_path, 'w') as filename:
             manifest = {
                 'metadata': {
                     'name': self.name,

@@ -23,9 +23,8 @@ def make_symlink(src, dst):
 
 def make_cp(*src, dest, root='', args=''):
     package = current_build().current_package
-    for filename in src:
-        path = f'{package.install_dir}/{root}/{filename}'
-        cmd(f'cp {args} {path} {dest}')
+    path = f'{package.install_dir}/{root}/{{{",".join(src)}}}'
+    cmd(f'cp {args} {path} {dest}')
 
 
 def make_mkdir(dir, args=''):
@@ -36,16 +35,14 @@ def make_mkdir(dir, args=''):
 
 def make_rm(*files, root='', args=''):
     package = current_build().current_package
-    for filename in files:
-        path = f'{package.install_dir}/{root}/{filename}'
-        cmd(f'rm {args} {path}')
+    path = f'{package.install_dir}/{root}/{{{",".join(files)}}}'
+    cmd(f'rm {args} {path}')
 
 
 def make_mv(*src, dest, root='', args=''):
     package = current_build().current_package
-    for filename in src:
-        path = f'{package.install_dir}/{root}/{filename}'
-        cmd(f'mv {args} {path} {dest}')
+    path = f'{package.install_dir}/{root}/{{{",".join(src)}}}'
+    cmd(f'mv {args} {path} {dest}')
 
 
 def make_chmod(dest, args):

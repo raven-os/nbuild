@@ -39,7 +39,7 @@ def make_rm(*files, root='', args=''):
     cmd(f'rm {args} {path}')
 
 
-def make_mv(*src, dest, root='', args=''):
+def make_mv(*src, root='', dest, args=''):
     package = current_build().current_package
     path = f'{package.install_dir}/{root}/{{{",".join(src)}}}'
     cmd(f'mv {args} {path} {dest}')

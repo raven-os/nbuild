@@ -51,10 +51,13 @@ def make_chmod(dest, args):
     cmd(f'chmod {args} {path}')
 
 
-def make_sed(regex, filename, args=''):
+def make_sed(regex, filename, args='', inPlace=True):
     package = current_build().current_package
     path = f'{package.install_dir}/{filename}'
-    cmd(f'sed -i {args} {regex} {path}')
+    if inPlace:
+        cmd(f'sed -i {args} {regex} {path}')
+    else:
+        cmd(f'sed {args} {regex} {path}')
 
 
 def install_file(source, dest, chmod=0o644):

@@ -24,7 +24,7 @@ def make_symlink(src, dst):
 def make_cp(*src, dest, root='', args=''):
     package = current_build().current_package
     for filename in src:
-        path = f'{package.install_dir}/{root}/{filename}/'
+        path = f'{package.install_dir}/{root}/{filename}'
         cmd(f'cp {args} {path} {dest}')
 
 
@@ -37,27 +37,27 @@ def make_mkdir(dir, args=''):
 def make_rm(*files, root='', args=''):
     package = current_build().current_package
     for filename in files:
-        path = f'{package.install_dir}/{root}/{filename}/'
+        path = f'{package.install_dir}/{root}/{filename}'
         cmd(f'rm {args} {path}')
 
 
 def make_mv(*src, dest, root='', args=''):
     package = current_build().current_package
     for filename in src:
-        path = f'{package.install_dir}/{root}/{filename}/'
+        path = f'{package.install_dir}/{root}/{filename}'
         cmd(f'mv {args} {path} {dest}')
 
 
 def make_chmod(dest, args):
     package = current_build().current_package
-    path = f'{package.install_dir}/{dest}/'
+    path = f'{package.install_dir}/{dest}'
     cmd(f'chmod {args} {path}')
 
 
 def make_sed(regex, filename, args=''):
     package = current_build().current_package
-    path = f'{package.install_dir}/{filename}/'
-    cmd(f'sed {args} {regex} {path}')
+    path = f'{package.install_dir}/{filename}'
+    cmd(f'sed -i {args} {regex} {path}')
 
 
 def install_file(source, dest, chmod=0o644):

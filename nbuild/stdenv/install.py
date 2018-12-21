@@ -21,7 +21,7 @@ def make_symlink(src, dst):
     os.symlink(src, dst)
 
 
-def make_cp(*src, dest, root='', args=''):
+def make_cp(*src, root='', dest, args=''):
     package = current_build().current_package
     path = f'{package.install_dir}/{root}/{{{",".join(src)}}}'
     cmd(f'cp {args} {path} {dest}')

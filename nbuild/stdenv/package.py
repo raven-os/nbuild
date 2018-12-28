@@ -75,8 +75,8 @@ class Package():
 
             # Target & host architecture
             # TODO FIXME Set as parameter
-            os.environ['TARGET'] = 'x86_64-pc-linux-gnu'
-            os.environ['HOST'] = 'x86_64-pc-linux-gnu'
+            os.environ['TARGET'] = 'x86_64-linux-gnu'
+            os.environ['HOST'] = 'x86_64-linux-gnu'
 
             # Common flags for the gnu toolchain (cpp, cc, cxx, as, ld)
             gnuflags = '-O -s -m64 -mtune=generic'

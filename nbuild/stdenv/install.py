@@ -43,6 +43,12 @@ def make_rm_file(*files, root=''):
         os.remove(path)
 
 
+def make_rm_directory(dir, root=''):
+    package = current_build().current_package
+    path = f'{package.install_dir}/{root}/{dir}'
+    os.rmdir(path)
+
+
 def make_mv(*files, dest, root=''):
     package = current_build().current_package
     for filename in files:

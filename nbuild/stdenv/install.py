@@ -3,6 +3,7 @@
 
 import os
 import shutil
+import re
 from nbuild.stdenv.build import current_build
 from nbuild.cmd import cmd
 
@@ -21,43 +22,50 @@ def make_symlink(src, dst):
     os.symlink(src, dst)
 
 
-def make_cp(*src, root='', dest, args=''):
+def make_cp(*files, dest, root=''):
     package = current_build().current_package
-    path = f'{package.install_dir}/{root}/{{{",".join(src)}}}'
-    cmd(f'cp {args} {path} {dest}')
+    for filename in files:
+        path = f'{package.install_dir}/{root}/{filename}'
+        shutil.copy2(path, dest)
 
 
-def make_mkdir(dir, args=''):
+def make_mkdir(dir):
     package = current_build().current_package
     path = f'{package.install_dir}/{dir}/'
-    cmd(f'mkdir {args} {path}')
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
-def make_rm(*files, root='', args=''):
+def make_rm_file(*files, root=''):
     package = current_build().current_package
-    path = f'{package.install_dir}/{root}/{{{",".join(files)}}}'
-    cmd(f'rm {args} {path}')
+    for filename in files:
+        path = f'{package.install_dir}/{root}/{filename}'
+        os.remove(path)
 
 
-def make_mv(*src, root='', dest, args=''):
+def make_mv(*files, dest, root=''):
     package = current_build().current_package
-    path = f'{package.install_dir}/{root}/{{{",".join(src)}}}'
-    cmd(f'mv {args} {path} {dest}')
+    for filename in files:
+        path = f'{package.install_dir}/{root}/{filename}'
+        shutil.move(path, dest)
 
 
-def make_chmod(dest, args):
+def make_chmod(dest, mode, root=''):
     package = current_build().current_package
-    path = f'{package.install_dir}/{dest}'
-    cmd(f'chmod {args} {path}')
+    path = f'{package.install_dir}/{root}/{dest}'
+    octal_mode = "0o" + mode
+    os.chmod(path, octal_mode)
 
 
-def make_sed(regex, filename, args='', inPlace=True):
+def make_sed(regex, replacement, filename, root=''):
     package = current_build().current_package
-    path = f'{package.install_dir}/{filename}'
-    if inPlace:
-        cmd(f'sed -i {args} {regex} {path}')
-    else:
-        cmd(f'sed {args} {regex} {path}')
+    path = f'{package.install_dir}/{root}/{filename}'
+    input = open(path, 'r')
+    content = input.read()
+    input.close()
+    f = open(path, 'w')
+    f.write(re.sub(regex, replacement, content))
+    f.close()
 
 
 def install_file(source, dest, chmod=0o644):

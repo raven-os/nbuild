@@ -75,8 +75,8 @@ class Package():
 
             # Target & host architecture
             # TODO FIXME Set as parameter
-            os.environ['TARGET'] = 'x86_64-pc-linux-gnu'
-            os.environ['HOST'] = 'x86_64-pc-linux-gnu'
+            os.environ['TARGET'] = 'x86_64-linux-gnu'
+            os.environ['HOST'] = 'x86_64-linux-gnu'
 
             # Common flags for the gnu toolchain (cpp, cc, cxx, as, ld)
             gnuflags = '-O -s -m64 -mtune=generic'
@@ -153,7 +153,7 @@ class Package():
         ilog(f"Output placed in {self.package_dir}")
 
 
-def package(id: str, description, build_dependencies={}, run_dependencies={}):
+def package(id: str, description: str, build_dependencies={}, run_dependencies={}):
 
     def register_package(builder):
         package = Package(id, description, builder, run_dependencies)

@@ -5,7 +5,7 @@ import os
 import subprocess
 from copy import deepcopy
 from textwrap import dedent
-from nbuild.args import nbuild_args
+from nbuild.args import get_args
 from nbuild.log import ilog, dlog, flog
 
 
@@ -20,7 +20,7 @@ def cmd(
 
     This is nothing more than a wrapper to reduce boilerplate.
     """
-    global nbuild_args
+    nbuild_args = get_args()
 
     cmd = dedent(cmd)
     new_env = deepcopy(os.environ)

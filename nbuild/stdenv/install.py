@@ -36,14 +36,14 @@ def make_mkdir(dir):
         os.makedirs(path)
 
 
-def make_rm_file(*files, root=''):
+def make_rm_files(*files, root=''):
     package = current_build().current_package
     for filename in files:
         path = f'{package.install_dir}/{root}/{filename}'
         os.remove(path)
 
 
-def make_rm_directory(dir, root=''):
+def make_rmdir(dir, root=''):
     package = current_build().current_package
     path = f'{package.install_dir}/{root}/{dir}'
     os.rmdir(path)
@@ -59,19 +59,16 @@ def make_mv(*files, dest, root=''):
 def make_chmod(dest, mode, root=''):
     package = current_build().current_package
     path = f'{package.install_dir}/{root}/{dest}'
-    octal_mode = "0o" + mode
-    os.chmod(path, octal_mode)
+    os.chmod(path, mode)
 
 
-def make_sed(regex, replacement, filename, root=''):
+def make_sed(regex, filename, root='', args='', inPlace=True):
     package = current_build().current_package
     path = f'{package.install_dir}/{root}/{filename}'
-    input = open(path, 'r')
-    content = input.read()
-    input.close()
-    f = open(path, 'w')
-    f.write(re.sub(regex, replacement, content))
-    f.close()
+    if inPlace:
+        cmd(f'sed -i {args} {regex} {path}')
+    else:
+        cmd(f'sed {args} {regex} {path}')
 
 
 def install_file(source, dest, chmod=0o644):

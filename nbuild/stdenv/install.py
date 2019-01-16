@@ -62,10 +62,10 @@ def make_chmod(dest, mode, root=''):
     os.chmod(path, mode)
 
 
-def make_sed(regex, filename, root='', args='', inPlace=True):
+def make_sed(regex, filename, root='', args='', in_place=True):
     package = current_build().current_package
     path = f'{package.install_dir}/{root}/{filename}'
-    if inPlace:
+    if in_place:
         cmd(f'sed -i {args} {regex} {path}')
     else:
         cmd(f'sed {args} {regex} {path}')

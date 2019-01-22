@@ -6,6 +6,7 @@ import shutil
 import random
 from nbuild.args import get_args
 from nbuild.log import clog, ilog
+from nbuild.checks import check_package
 
 _current_build = None
 
@@ -43,6 +44,8 @@ class Build():
             clog(f"Building ({1}/{nb_packages}) - {package}", indent=False)
             self.current_package = package
             package.build()
+            if not get_args().no_sanity_checks:
+                check_package(package)
             self.current_package = None
 
         clog(f"Finished building packages of {self.name}.", indent=False)

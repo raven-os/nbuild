@@ -3,7 +3,9 @@
 
 import os
 import shutil
+import re
 from nbuild.stdenv.build import current_build
+from nbuild.cmd import cmd
 
 
 def make_keeper(dest):
@@ -18,6 +20,55 @@ def make_symlink(src, dst):
     package = current_build().current_package
     dst = f'{package.install_dir}/{dst}'
     os.symlink(src, dst)
+
+
+def make_cp(*files, dest, root=''):
+    package = current_build().current_package
+    for filename in files:
+        path = f'{package.install_dir}/{root}/{filename}'
+        shutil.copy2(path, dest)
+
+
+def make_mkdir(dir):
+    package = current_build().current_package
+    path = f'{package.install_dir}/{dir}/'
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+def make_rm_files(*files, root=''):
+    package = current_build().current_package
+    for filename in files:
+        path = f'{package.install_dir}/{root}/{filename}'
+        os.remove(path)
+
+
+def make_rmdir(dir, root=''):
+    package = current_build().current_package
+    path = f'{package.install_dir}/{root}/{dir}'
+    os.rmdir(path)
+
+
+def make_mv(*files, dest, root=''):
+    package = current_build().current_package
+    for filename in files:
+        path = f'{package.install_dir}/{root}/{filename}'
+        shutil.move(path, dest)
+
+
+def make_chmod(dest, mode, root=''):
+    package = current_build().current_package
+    path = f'{package.install_dir}/{root}/{dest}'
+    os.chmod(path, mode)
+
+
+def make_sed(regex, filename, root='', args='', in_place=True):
+    package = current_build().current_package
+    path = f'{package.install_dir}/{root}/{filename}'
+    if in_place:
+        cmd(f'sed -i {args} {regex} {path}')
+    else:
+        cmd(f'sed {args} {regex} {path}')
 
 
 def install_file(source, dest, chmod=0o644):

@@ -41,7 +41,6 @@ def parse_args():
     nbuild_parser.add_argument(
         '-C',
         '--check',
-        action='append',
         nargs='*',
         help="Check the validity of an already built package",
     )

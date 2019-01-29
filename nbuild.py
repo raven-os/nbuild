@@ -45,24 +45,17 @@ def main():
 
         os.chdir(cwd)
 
-    for x in args.check:
-        if len(x) == 0:
-            elog("You need to provide a manifest and directories to be checked")
-            continue
-        manifest_path = x[0]
-        dirs = x[1:]
+    if args.check is not None and len(args.check) > 0:
+        for manifest_path in args.check:
+            spec = load_manifest(manifest_path)
+            set_current_build(Build())
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
 
-        if len(dirs) == 0:
-            elog(f"You need to provide directories to be checked for '{manifest_path}'.")
-            continue
-
-        spec = load_manifest(manifest_path)
-        set_current_build(Build())
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-
-        for pkg in current_build().packages:
-            check_package(pkg)
+            for pkg in current_build().packages:
+                check_package(pkg)
+    else:
+        elog("You need to provide a manifest to a package to be checked.")
 
 
 if __name__ == "__main__":

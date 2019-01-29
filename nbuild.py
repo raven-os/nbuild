@@ -45,17 +45,25 @@ def main():
 
         os.chdir(cwd)
 
-    if args.check is not None and len(args.check) > 0:
-        for manifest_path in args.check:
-            spec = load_manifest(manifest_path)
-            set_current_build(Build())
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
+    if args.check is not None:
+        if len(args.check) == 0:
+            elog("You need to provide a manifest to a package to be checked.")
+        else:
+            for manifest_path in args.check:
+                spec = load_manifest(manifest_path)
+                set_current_build(Build())
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
 
-            for pkg in current_build().packages:
-                check_package(pkg)
-    else:
-        elog("You need to provide a manifest to a package to be checked.")
+                for pkg in current_build().packages:
+                    pid = os.fork()
+                    if pid == 0:
+                        os.chdir(pkg.install_dir)
+                        os.chroot('.')
+                        check_package(pkg)
+                        os._exit(0)
+                    else:
+                        os.wait()
 
 
 if __name__ == "__main__":

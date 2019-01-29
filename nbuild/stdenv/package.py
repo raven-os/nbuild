@@ -48,6 +48,10 @@ class Package():
         self.install_dir = os.path.join(cwd, cache_dir, 'installs/', dir)
         self.package_dir = os.path.join(cwd, output_dir, dir)
 
+    def __str__(self):
+        return self.id
+
+    def build(self):
         # Erase old content of previous builds
         if os.path.exists(self.package_dir):
             shutil.rmtree(self.package_dir)
@@ -59,10 +63,6 @@ class Package():
         os.makedirs(self.install_dir, exist_ok=True)
         os.makedirs(self.package_dir, exist_ok=True)
 
-    def __str__(self):
-        return self.id
-
-    def build(self):
         if get_args().verbose >= 1:
             dlog(f"Download dir: {self.download_dir}", indent=False)
             dlog(f"Build dir: {self.build_dir}", indent=False)

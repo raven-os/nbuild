@@ -48,7 +48,7 @@ def ilog(*args, indent=True):
 
 def slog(*args, indent=True):
     """
-    Prints an informative log, prefixed by a green `[+]`.
+    Prints a success log, prefixed by a green `[+]`.
     """
     global log_tab_level
 

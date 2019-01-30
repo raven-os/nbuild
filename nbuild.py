@@ -56,14 +56,7 @@ def main():
                 spec.loader.exec_module(module)
 
                 for pkg in current_build().packages:
-                    pid = os.fork()
-                    if pid == 0:
-                        os.chdir(pkg.install_dir)
-                        os.chroot('.')
-                        check_package(pkg)
-                        os._exit(0)
-                    else:
-                        os.wait()
+                    check_package(pkg)
 
 
 if __name__ == "__main__":

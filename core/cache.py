@@ -1,19 +1,18 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Functions to manipulate the different kind of caches.
+Functions to manipulate the different kinds of caches.
 """
 
 import os
 import sys
 import shutil
 import random
+import stdlib
 from core.args import get_args
-from stdlib.build import Build
-from stdlib.package import Package
 
 
-def get_install_cache(build: Build):
+def get_install_cache(build: stdlib.Build):
     """
     Returns the location of the cache where the files produced by the given build should be placed.
     The content of this cache mimics a Linux file system.
@@ -26,10 +25,10 @@ def get_install_cache(build: Build):
     )
 
 
-def get_download_cache(build: Build):
+def get_download_cache(build: stdlib.Build):
     """
     Returns the location of the cache where the files downloaded by the given build should be placed.
-    This cache is kept across build to avoid downloading the same files over and over.
+    This cache is kept across builds to avoid downloading the same files over and over.
     """
     return os.path.join(
         get_args().cache_dir,
@@ -39,7 +38,7 @@ def get_download_cache(build: Build):
     )
 
 
-def get_build_cache(build: Build):
+def get_build_cache(build: stdlib.Build):
     """
     Returns the location of the cache where all the packages are built. It is also the place where the downloaded files
     are copied and extracted after download.
@@ -52,9 +51,9 @@ def get_build_cache(build: Build):
     )
 
 
-def get_wrap_cache(package: Package):
+def get_wrap_cache(package: stdlib.Package):
     """
-    Returns the location of the cache where the files composing of the given package should be placed.
+    Returns the location of the cache where the files composing the given package should be placed.
     When calling Package.wrap(), the content of this cache is compressed into a tarball.
     The content of this cache mimics a Linux file system.
     """
@@ -68,7 +67,7 @@ def get_wrap_cache(package: Package):
     )
 
 
-def get_package_cache(package: Package):
+def get_package_cache(package: stdlib.Package):
     """
     Returns the location of the cache where the final package, at the very end of the build process, should be placed.
     This cache is populated by Package.wrap() and contains the manifest and data of the package.

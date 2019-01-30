@@ -31,7 +31,7 @@ def main():
     # Clear environment, inflate a default one
     os.environ.clear()
 
-    # Target & host architecture
+    # Target and host architecture
     # TODO FIXME Set as parameter
     os.environ['TARGET'] = 'x86_64-linux-gnu'
     os.environ['HOST'] = 'x86_64-linux-gnu'

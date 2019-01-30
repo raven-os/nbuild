@@ -14,7 +14,7 @@ log_tab_level = 0
 @contextmanager
 def pushlog():
     """
-    Increases the log indentation level by one, making all new lines indented by one more tabulation.
+    Increases the log indentation level by one, making every new line indented by one extra tabulation.
     """
     global log_tab_level
     log_tab_level += 1
@@ -27,7 +27,7 @@ def pushlog():
 
 def dlog(*args, indent=True):
     """
-    Prints a debug log, prefix by a magenta `[d]`.
+    Prints a debug log, prefixed by a magenta `[d]`.
     """
     global log_tab_level
 
@@ -48,7 +48,7 @@ def ilog(*args, indent=True):
 
 def slog(*args, indent=True):
     """
-    Prints an informative log, prefixed by a green `[+]`.
+    Prints a success log, prefixed by a green `[+]`.
     """
     global log_tab_level
 
@@ -68,7 +68,7 @@ def wlog(*args, indent=True):
 
 def elog(*args, indent=True):
     """
-    Prints an non-fatal error log, prefixed by a red `[-]`.
+    Prints a non-fatal error log, prefixed by a red `[-]`.
     """
     global log_tab_level
 
@@ -78,7 +78,7 @@ def elog(*args, indent=True):
 
 def flog(args):
     """
-    Prints an fatal error log, all in red, prefixed by `[-]`.
+    Prints a fatal error log, all in red, prefixed by `[-]`.
     This function does NOT abort the current process's execution.
     """
-    termcolor.cprint(f"[-] {args}", "red", attrs=['bold'])
+    termcolor.cprint(f"[-] {args}", 'red', attrs=['bold'])

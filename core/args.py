@@ -46,7 +46,7 @@ def parse_args():
     nbuild_parser.add_argument(
         '--purge',
         action='store_true',
-        help='Remove all cached data.',
+        help="Remove all cached data.",
     )
     nbuild_parser.add_argument(
         '-r',

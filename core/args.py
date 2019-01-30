@@ -21,7 +21,7 @@ def parse_args():
     global nbuild_args
 
     nbuild_parser = argparse.ArgumentParser(
-        description='Compiles packages from a build Manifest.'
+        description="Compiles packages from a build Manifest."
     )
     nbuild_parser.add_argument(
         '-o',
@@ -31,7 +31,7 @@ def parse_args():
             os.path.dirname(sys.argv[0]),
             'packages',
         ),
-        help='Output directory for built packages. Default: packages/',
+        help="Output directory for built packages. Default: packages/",
     )
     nbuild_parser.add_argument(
         '-c',
@@ -41,7 +41,7 @@ def parse_args():
             os.path.dirname(sys.argv[0]),
             'cache',
         ),
-        help='Cache directory used when downloading and building packages. Default: cache/',
+        help="Cache directory used when downloading and building packages. Default: cache/",
     )
     nbuild_parser.add_argument(
         '--purge',
@@ -53,7 +53,7 @@ def parse_args():
         '--repository',
         default='stable',
         metavar='REPOSITORY',
-        help='Name of the repository built packages will be a part of. Default: stable',
+        help="Name of the repository the built packages will be a part of. Default: stable",
     )
     nbuild_parser.add_argument(
         'manifest',
@@ -65,7 +65,7 @@ def parse_args():
         '--verbose',
         action='count',
         default=0,
-        help='Make the operation more talkative. Append it multiple times to make it even more talkative.'
+        help="Make the operation more talkative. Append it multiple times to make it even more talkative."
     )
     nbuild_args = nbuild_parser.parse_args()
 

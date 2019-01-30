@@ -14,7 +14,7 @@ log_tab_level = 0
 @contextmanager
 def pushlog():
     """
-    Increases the log indentation level by one, making all new lines indented by one more tabulation.
+    Increases the log indentation level by one, making every new line indented by one extra tabulation.
     """
     global log_tab_level
     log_tab_level += 1

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Functions to manipulate the different kind of caches.
+Functions to manipulate the different kinds of caches.
 """
 
 import os
@@ -28,7 +28,7 @@ def get_install_cache(build: stdlib.Build):
 def get_download_cache(build: stdlib.Build):
     """
     Returns the location of the cache where the files downloaded by the given build should be placed.
-    This cache is kept across build to avoid downloading the same files over and over.
+    This cache is kept across builds to avoid downloading the same files over and over.
     """
     return os.path.join(
         get_args().cache_dir,

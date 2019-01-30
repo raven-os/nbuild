@@ -72,8 +72,8 @@ def parse_args():
 
 def get_args():
     """
-    Returns an object holding the value of each command line arguments.
-    It is the return value of `argprase.ArgumentParser.parse_args()`, so refer to `argparse`'s documentation
+    Returns an object holding the values of each command line argument.
+    It is the return value of `argparse.ArgumentParser.parse_args()`, so refer to `argparse`'s documentation
     for its exact behaviour.
     """
     return nbuild_args

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Main module of Nest Build: Raven-OS's automated build system for lazy maintainers.
+Main module of Nest Build: Raven-OS's automated package builder for lazy maintainers.
 """
 
 import os

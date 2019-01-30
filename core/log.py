@@ -27,7 +27,7 @@ def pushlog():
 
 def dlog(*args, indent=True):
     """
-    Prints a debug log, prefix by a magenta `[d]`.
+    Prints a debug log, prefixed by a magenta `[d]`.
     """
     global log_tab_level
 
@@ -68,7 +68,7 @@ def wlog(*args, indent=True):
 
 def elog(*args, indent=True):
     """
-    Prints an non-fatal error log, prefixed by a red `[-]`.
+    Prints a non-fatal error log, prefixed by a red `[-]`.
     """
     global log_tab_level
 
@@ -78,7 +78,7 @@ def elog(*args, indent=True):
 
 def flog(args):
     """
-    Prints an fatal error log, all in red, prefixed by `[-]`.
+    Prints a fatal error log, all in red, prefixed by `[-]`.
     This function does NOT abort the current process's execution.
     """
-    termcolor.cprint(f"[-] {args}", "red", attrs=['bold'])
+    termcolor.cprint(f"[-] {args}", 'red', attrs=['bold'])

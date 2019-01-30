@@ -1,5 +1,8 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
+"""
+Functions to parse and retrieve command line arguments.
+"""
 
 import os
 import sys

@@ -5,14 +5,14 @@ import os
 import toml
 import shutil
 import tarfile
-from os import makedirs
+import re
 from datetime import datetime
 from multiprocessing import cpu_count
 from nbuild.log import ilog, dlog
 from nbuild.args import get_args
 from nbuild.pushd import pushd
 from nbuild.pushenv import pushenv
-from nbuild.stdenv.build import current_build
+import nbuild.stdenv.build as nbuild
 
 
 class Package():
@@ -25,10 +25,7 @@ class Package():
     ):
         self.id = package_id
         self.description = description.replace('\n', ' ').strip()
-        self.repository = package_id.split('::')[0]
-        self.category = package_id.split('::')[1].split('/')[0]
-        self.name = package_id.split('/')[1].split('#')[0]
-        self.version = package_id.split('#')[1]
+        self.repository, self.category, self.name, self.version = self.split_id(package_id)
         self.builder = builder
 
         self.run_dependencies = run_dependencies
@@ -43,13 +40,20 @@ class Package():
         cwd = os.getcwd()
         cache_dir = get_args().cache_dir
         output_dir = get_args().output_dir
-        self.build_dir = current_build().build_dir
+        self.build_dir = nbuild.current_build().build_dir
         self.download_dir = os.path.join(cwd, cache_dir, 'downloads/', dir)
         self.install_dir = os.path.join(cwd, cache_dir, 'installs/', dir)
         self.package_dir = os.path.join(cwd, output_dir, dir)
 
     def __str__(self):
         return self.id
+
+    @staticmethod
+    def split_id(package_id):
+        """
+        Returns a tuple (repository, category, name, version) from the package id
+        """
+        return tuple(re.split('::|[/#]', package_id))
 
     def build(self):
         # Erase old content of previous builds
@@ -157,6 +161,6 @@ def package(id: str, description: str, build_dependencies={}, run_dependencies={
 
     def register_package(builder):
         package = Package(id, description, builder, run_dependencies)
-        current_build().queue_package(package)
+        nbuild.current_build().queue_package(package)
 
     return register_package

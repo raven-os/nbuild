@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
-from nbuild.log import elog, ilog, wlog
+from nbuild.log import elog, ilog, clog
 
 
 def id_syntax_check(package):
@@ -32,7 +32,7 @@ def check_syntax(pkg):
         desc_syntax_check(pkg),
     ])
     if ret:
-        ilog("\tAll syntax checks OK")
+        clog("\tAll syntax checks OK")
     else:
-        wlog("\tSome syntax checks failed")
+        elog("\tSome syntax checks failed")
     return ret

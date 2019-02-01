@@ -1,7 +1,7 @@
 import os
 from elftools.elf.elffile import ELFFile
 from elftools.common.exceptions import ELFError
-from nbuild.log import ilog, elog, wlog
+from nbuild.log import ilog, elog, clog
 import nbuild.stdenv.package
 import nbuild.checks.check as check
 
@@ -83,7 +83,7 @@ def check_deps(pkg):
         check_libs(pkg),
     ])
     if ret:
-        ilog("\tDependency checks OK")
+        clog("\tDependency checks OK")
     else:
-        wlog("\tSome dependency checks failed")
+        elog("\tSome dependency checks failed")
     return ret

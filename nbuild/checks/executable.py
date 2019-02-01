@@ -1,5 +1,5 @@
 import os
-from nbuild.log import wlog, elog, ilog
+from nbuild.log import wlog, elog, ilog, clog
 import nbuild.checks.check as check
 
 
@@ -57,7 +57,7 @@ def check_exec(pkg):
         check_libs_x(pkg),
     ])
     if ret:
-        ilog("\tExecutable checks OK")
+        clog("\tExecutable checks OK")
     else:
-        wlog("\tSome executable checks failed")
+        elog("\tSome executable checks failed")
     return ret

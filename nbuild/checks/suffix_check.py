@@ -5,7 +5,7 @@ import os
 import re
 import glob
 from nbuild.stdenv.package import Package
-from nbuild.log import elog, ilog, clog
+from nbuild.log import elog, clog, ilog
 
 
 def man_checker(package: Package, man_section):
@@ -99,7 +99,7 @@ def doc_installed(package: Package):
 
 
 def dev_check(package: Package):
-    ret = all(
+    return all(
         [
             man_checker(package, 3),
             bin_installed(package),
@@ -107,12 +107,10 @@ def dev_check(package: Package):
             lib_installed(package),
         ]
     )
-    if ret:
-        clog(f"The package {package.id} is installed correctly.")
 
 
 def doc_check(package: Package):
-    ret = all(
+    return all(
         [
             man_installed(package),
             bin_installed(package),
@@ -120,8 +118,6 @@ def doc_check(package: Package):
             header_installed(package)
         ]
     )
-    if ret:
-        clog(f"The package {package.id} is installed correctly.")
 
 
 def bin_check(package: Package):
@@ -129,7 +125,7 @@ def bin_check(package: Package):
 
 
 def lib_check(package: Package):
-    ret = all(
+    return all(
         [
             man_installed(package),
             bin_installed(package),
@@ -138,12 +134,10 @@ def lib_check(package: Package):
             header_installed(package)
         ]
     )
-    if ret:
-        clog(f"The package {package.id} is installed correctly.")
 
 
 def classic_check(package: Package):
-    ret = all(
+    return all(
         [
             man_installed(package, 3),
             lib_checker(package, '.so'),
@@ -151,19 +145,22 @@ def classic_check(package: Package):
             header_installed(package)
         ]
     )
-    if ret:
-        clog(f"The package {package.id} is installed correctly.")
 
 
 def suffix_checks(package: Package):
+    ilog("Looking for files that should not be there")
     suffix = package.name.split('-')[-1]
     if suffix == 'dev':
-        dev_check(package)
+        ret = dev_check(package)
     elif suffix == 'doc':
-        doc_check(package)
+        ret = doc_check(package)
     elif suffix == 'bin':
-        bin_check(package)
+        ret = bin_check(package)
     elif suffix == 'lib':
-        lib_check(package)
+        ret = lib_check(package)
     else:
-        classic_check(package)
+        ret = classic_check(package)
+    if ret:
+        clog("\tEverything seems OK")
+    else:
+        elog("\tSome files should not be there")

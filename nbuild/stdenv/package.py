@@ -12,7 +12,7 @@ from nbuild.log import ilog, dlog
 from nbuild.args import get_args
 from nbuild.pushd import pushd
 from nbuild.pushenv import pushenv
-from nbuild.stdenv.build import current_build
+import nbuild.stdenv.build
 
 
 class Package():
@@ -43,7 +43,7 @@ class Package():
         cwd = os.getcwd()
         cache_dir = get_args().cache_dir
         output_dir = get_args().output_dir
-        self.build_dir = current_build().build_dir
+        self.build_dir = nbuild.stdenv.build.current_build().build_dir
         self.download_dir = os.path.join(cwd, cache_dir, 'downloads/', dir)
         self.install_dir = os.path.join(cwd, cache_dir, 'installs/', dir)
         self.package_dir = os.path.join(cwd, output_dir, dir)
@@ -157,6 +157,6 @@ def package(id: str, description: str, build_dependencies={}, run_dependencies={
 
     def register_package(builder):
         package = Package(id, description, builder, run_dependencies)
-        current_build().queue_package(package)
+        nbuild.stdenv.build.current_build().queue_package(package)
 
     return register_package

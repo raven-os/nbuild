@@ -1,17 +1,9 @@
 import os
 from elftools.elf.elffile import ELFFile
 from elftools.common.exceptions import ELFError
-from nbuild.log import ilog, elog
+from nbuild.log import ilog, elog, wlog
 import nbuild.stdenv.package
 import nbuild.checks.check as check
-
-
-def find_dirs_ending_in(end, path):
-    dirs = []
-    for (dirname, dirnames, filenames) in os.walk(path):
-        dirs += [os.path.join(dirname, subdirname) for subdirname in dirnames
-                 if subdirname.endswith(end)]
-    return dirs
 
 
 def get_deps(filename):
@@ -53,7 +45,7 @@ def check_file(file, pkg):
                 found = True
                 break
         if not found:
-            elog(f"Possible missing dependency to '{dep}' in {file_wo_prefix}")
+            elog(f"Possible missing dependency to '{dep}' in '{file_wo_prefix}'")
     return True
 
 
@@ -62,21 +54,36 @@ def check_files(files, pkg):
 
 
 def check_bins(pkg):
-    dirs = find_dirs_ending_in('bin', pkg.install_dir)
-    for dirpath in map(lambda x: os.path.join(pkg.install_dir, x), dirs):
+    dirs = check.find_dirs_ending_in('bin', pkg.install_dir)
+    for dirpath in dirs:
+        path_wo_prefix = dirpath[len(pkg.install_dir):]
+        ilog(f"Checking dependencies for files in '{path_wo_prefix}'")
         binpaths = map(lambda x: os.path.join(dirpath, x), os.listdir(dirpath))
-        check_files(binpaths, pkg)
+        if not check_files(binpaths, pkg):
+            return False
+    return True
 
 
 def check_libs(pkg):
-    dirs = find_dirs_ending_in('lib', pkg.install_dir)
-    for dirpath in map(lambda x: os.path.join(pkg.install_dir, x), dirs):
+    dirs = check.find_dirs_ending_in('lib', pkg.install_dir)
+    for dirpath in dirs:
+        path_wo_prefix = dirpath[len(pkg.install_dir):]
+        ilog(f"Checking dependencies for shared libraries in '{path_wo_prefix}'")
         libpaths = map(lambda x: os.path.join(dirpath, x),
                        (f for f in os.listdir(dirpath) if '.so' in f))
-        check_files(libpaths, pkg)
+        if not check_files(libpaths, pkg):
+            return False
+    return True
 
 
 def check_deps(pkg):
     ilog("Checking dependencies")
-    check_bins(pkg)
-    check_libs(pkg)
+    ret = all([
+        check_bins(pkg),
+        check_libs(pkg),
+    ])
+    if ret:
+        ilog("\tDependency checks OK")
+    else:
+        wlog("\tSome dependency checks failed")
+    return ret

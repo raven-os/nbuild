@@ -1,65 +1,63 @@
 import os
-import sys
 from nbuild.log import wlog, elog, ilog
+import nbuild.checks.check as check
 
 
-def is_file_x(filename, x_expected=True):
+def is_file_x(filename, pkg, x_expected=True):
+    path_wo_prefix = filename[len(pkg.install_dir):]
     ret = os.access(filename, os.X_OK)
     if x_expected and not ret:
-        elog(f"'{filename}' is not executable, but should be")
+        elog(f"'{path_wo_prefix}' is not executable, but should be")
     elif not x_expected and ret:
-        wlog(f"'{filename}' is executable, but should not be")
+        wlog(f"'{path_wo_prefix}' is executable, but should not be")
     return ret
 
 
-def is_all_folder_x(dirpath):
+def are_files_x(files, pkg):
+    return all(map(lambda x: is_file_x(x, pkg), files))
+
+
+def is_all_folder_x(dirpath, pkg):
+    path_wo_prefix = dirpath[len(pkg.install_dir):]
     if os.path.exists(dirpath):
-        ilog(f"Checking if all files in folder '{dirpath}' are executable")
+        ilog(f"Checking if all files in folder '{path_wo_prefix}' are executable")
         files = os.listdir(dirpath)
         files_path = map(lambda x: os.path.join(dirpath, x), files)
-        return are_files_x(*list(files_path))
+        return are_files_x(files_path, pkg)
     return True
 
 
-def are_folders_x(*dirpaths):
-    return all(map(is_all_folder_x, dirpaths))
+def are_folders_x(pkg, dirpaths):
+    return all(map(lambda x: is_all_folder_x(x, pkg), dirpaths))
 
 
-def check_bins_x():
-    bin_path = os.path.join('/bin')
-    sbin_path = os.path.join('/sbin')
-    usrbin_path = os.path.join('/usr', 'bin')
-
-    return are_folders_x(bin_path, sbin_path, usrbin_path)
+def check_bins_x(pkg):
+    bindirs = check.find_dirs_ending_in('bin', pkg.install_dir)
+    return are_folders_x(pkg, bindirs)
 
 
-def are_files_x(*files):
-    return all(map(is_file_x, files))
-
-
-def are_shared_libs_x(dirpath):
+def are_shared_libs_x(dirpath, pkg):
+    path_wo_prefix = dirpath[len(pkg.install_dir):]
     if os.path.exists(dirpath):
-        ilog(f"Checking if all shared libraries in folder '{dirpath}' are executable")
+        ilog(f"Checking if all shared libraries in folder '{path_wo_prefix}' are executable")
         files = [x for x in os.listdir(dirpath) if '.so' in x]
         files_path = map(lambda x: os.path.join(dirpath, x), files)
-        return all(map(is_file_x, files_path))
+        return all(map(lambda x: is_file_x(x, pkg), files_path))
     return True
 
 
-def check_libs_x():
-    lib_path = os.path.join('/lib')
-    usrlib_path = os.path.join('/usr', 'lib')
-
-    return all(map(are_shared_libs_x, [lib_path, usrlib_path]))
+def check_libs_x(pkg):
+    bindirs = check.find_dirs_ending_in('lib', pkg.install_dir)
+    return all(map(lambda x: are_shared_libs_x(x, pkg), bindirs))
 
 
 def check_exec(pkg):
-    ret = all(
-        [
-            check_bins_x(),
-            check_libs_x(),
-        ]
-    )
+    ret = all([
+        check_bins_x(pkg),
+        check_libs_x(pkg),
+    ])
     if ret:
-        ilog("Executable checks OK")
+        ilog("\tExecutable checks OK")
+    else:
+        wlog("\tSome executable checks failed")
     return ret

@@ -8,8 +8,9 @@ Welcome to NBuild's documentation!
 
 This documentation covers all types and functions that can be found in a build manifest or in nbuild itself.
 
-It is made of two major modules: the :py:mod:`core` module and the :py:mod:`stdlib` module. The first one contains functions only
-used by :py:mod:`nbuild` or by :py:mod:`stdlib` and shouldn't be used by a build manifest. On the over hand, :py:mod:`stdlib` is made to be used by build manifests.
+It is made of two major modules: the :py:mod:`core` module and the :py:mod:`stdlib` module.
+The first one contains functions only used by :py:mod:`nbuild` or by :py:mod:`stdlib` and shouldn't be used by a build manifest.
+On the other hand, :py:mod:`stdlib` is made to be used by build manifests.
 
 Indices and tables
 ==================

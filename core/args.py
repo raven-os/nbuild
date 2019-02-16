@@ -69,7 +69,7 @@ def parse_args():
 
 
 def get_args():
-    """Returns an object holding the values of each command line argument.
+    """Return an object holding the values of each command line argument.
 
     This function relays the return value of :py:func:`argparse.ArgumentParser.parse_args()`, so refer to :py:mod:`argparse`'s documentation
     for its exact behaviour.
@@ -78,5 +78,5 @@ def get_args():
 
 
 def print_usage():
-    """Prints the usage to the standard output."""
+    """Print the usage to the standard output."""
     nbuild_parser.print_help()

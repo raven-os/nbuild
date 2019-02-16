@@ -13,7 +13,7 @@ log_tab_level = 0
 
 @contextmanager
 def pushlog():
-    """Increases the log indentation level by one, making every new line indented by one extra tabulation."""
+    """Increase the log indentation level by one, making every new line indented by one extra tabulation."""
     global log_tab_level
     log_tab_level += 1
 
@@ -24,7 +24,7 @@ def pushlog():
 
 
 def dlog(*logs):
-    """Prints a debug log, prefixed by a magenta `[d]`.
+    """Print a debug log, prefixed by a magenta `[d]`.
 
     :param logs: The content of the log.
     """
@@ -35,7 +35,7 @@ def dlog(*logs):
 
 
 def ilog(*logs):
-    """Prints an informative log, prefixed by a blue `[*]`.
+    """Print an informative log, prefixed by a blue `[*]`.
 
     :param logs: The content of the log.
     """
@@ -46,7 +46,7 @@ def ilog(*logs):
 
 
 def slog(*args):
-    """Prints a success log, prefixed by a green `[+]`.
+    """Print a success log, prefixed by a green `[+]`.
 
     :param logs: The content of the log.
     """
@@ -57,7 +57,7 @@ def slog(*args):
 
 
 def wlog(*logs):
-    """Prints a warning log, prefixed by a yellow `[!]`.
+    """Print a warning log, prefixed by a yellow `[!]`.
 
     :param logs: The content of the log.
     """
@@ -68,7 +68,7 @@ def wlog(*logs):
 
 
 def elog(*logs):
-    """Prints a non-fatal error log, prefixed by a red `[-]`.
+    """Print a non-fatal error log, prefixed by a red `[-]`.
 
     :param logs: The content of the log.
     """
@@ -79,7 +79,7 @@ def elog(*logs):
 
 
 def flog(logs):
-    """Prints a fatal error log, all in red, prefixed by `[-]`.
+    """Print a fatal error log, all in red, prefixed by `[-]`.
 
     :info: This function does NOT abort the current process's execution.
     :param logs: The content of the log.

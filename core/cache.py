@@ -13,7 +13,7 @@ from core.args import get_args
 
 
 def get_install_cache(build: stdlib.Build) -> str:
-    """Return a path pointing to the cache where the files produced by the given build should be stored.
+    """Get the path pointing to the cache where the files produced by the given build should be stored.
 
     :info: The content of this cache mimics a Linux file system
     :param build: The build associated with the cache
@@ -28,7 +28,7 @@ def get_install_cache(build: stdlib.Build) -> str:
 
 
 def get_download_cache(build: stdlib.Build) -> str:
-    """Return a path pointing to the cache where the files downloaded by the given build should be stored.
+    """Get the path pointing to the cache where the files downloaded by the given build should be stored.
 
     :info: This cache is kept across builds to avoid downloading the same files over and over
     :param build: The build associated with the cache
@@ -43,7 +43,7 @@ def get_download_cache(build: stdlib.Build) -> str:
 
 
 def get_build_cache(build: stdlib.Build) -> str:
-    """Return a path pointing to the cache where the given build should be built.
+    """Get the path pointing to the cache where the given build should be built.
 
     :param build: The build associated with the cache
     :returns: The path pointing to the cache where the build is built
@@ -57,7 +57,7 @@ def get_build_cache(build: stdlib.Build) -> str:
 
 
 def get_wrap_cache(package: stdlib.Package) -> str:
-    """Return a path pointing to the cache where the files belonging to the given package should be stored.
+    """Get the path pointing to the cache where the files belonging to the given package should be stored.
 
     When the build is over, all files in the cache will be wrapped to form the package's content.
 
@@ -76,7 +76,7 @@ def get_wrap_cache(package: stdlib.Package) -> str:
 
 
 def get_package_cache(package: stdlib.Package) -> str:
-    """Return a path pointing to the cache where the final package, at the very end of the build process, should be stored.
+    """Get the path pointing to the cache where the final package, at the very end of the build process, should be stored.
 
     This cache is populated automatically at the end of the build process. A build manifest should not have to write anything to it.
 

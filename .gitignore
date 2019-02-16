@@ -118,3 +118,7 @@ dmypy.json
 /packages/
 /build/
 /cache/
+/docs/build/
+/docs/source/core*.rst
+/docs/source/nbuild*.rst
+/docs/source/stdlib*.rst

@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Main module of Nest Build: Raven-OS's automated package builder for lazy maintainers.
-"""
+"""NBuild: Raven-OS's automated package builder for lazy maintainers"""
 
 import os
 import re
 import importlib.util
 import core
-from core.log import slog, flog
+import stdlib
 from dotenv import load_dotenv
 from multiprocessing import cpu_count
 
@@ -25,7 +23,7 @@ def main():
         exit(0)
 
     if core.args.get_args().manifest is None:
-        flog("No path to a build manifest given.")
+        stdlib.log.flog("No path to a build manifest given.")
         exit(1)
 
     # Clear environment, inflate a default one
@@ -79,7 +77,7 @@ def main():
     manifest_path = core.args.get_args().manifest
     spec = importlib.util.spec_from_file_location('build_manifest', manifest_path)
     if not spec:
-        flog(f"Failed to load Build Manifest located at path \"{manifest_path}\"")
+        stdlib.log.flog(f"Failed to load Build Manifest located at path \"{manifest_path}\"")
         exit(1)
 
     module = importlib.util.module_from_spec(spec)

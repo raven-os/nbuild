@@ -1,8 +1,6 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
-"""
-Functions to parse and retrieve command line arguments.
-"""
+"""Functions to parse and retrieve command line arguments."""
 
 import os
 import sys
@@ -13,9 +11,9 @@ nbuild_parser = None
 
 
 def parse_args():
-    """
-    Parses the command line arguments.
-    This function may exit if the command line arguments are invalid.
+    """Parse the command line arguments.
+
+    :note: Exit if the command line arguments are invalid.
     """
     global nbuild_parser
     global nbuild_args
@@ -71,16 +69,14 @@ def parse_args():
 
 
 def get_args():
-    """
-    Returns an object holding the values of each command line argument.
-    It is the return value of `argparse.ArgumentParser.parse_args()`, so refer to `argparse`'s documentation
+    """Returns an object holding the values of each command line argument.
+
+    This function relays the return value of :py:func:`argparse.ArgumentParser.parse_args()`, so refer to :py:mod:`argparse`'s documentation
     for its exact behaviour.
     """
     return nbuild_args
 
 
 def print_usage():
-    """
-    Prints the usage to the standard output.
-    """
+    """Prints the usage to the standard output."""
     nbuild_parser.print_help()

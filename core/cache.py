@@ -12,10 +12,12 @@ import stdlib
 from core.args import get_args
 
 
-def get_install_cache(build: stdlib.Build):
-    """
-    Returns the location of the cache where the files produced by the given build should be placed.
-    The content of this cache mimics a Linux file system.
+def get_install_cache(build: stdlib.Build) -> str:
+    """Returns a path pointing to the cache where the files produced by the given build should be stored.
+
+    :info: The content of this cache mimics a Linux file system.
+    :param build: The build associated with the cache
+    :returns: The path pointing to the cache where the produced files should be stored
     """
     return os.path.join(
         get_args().cache_dir,
@@ -25,10 +27,12 @@ def get_install_cache(build: stdlib.Build):
     )
 
 
-def get_download_cache(build: stdlib.Build):
-    """
-    Returns the location of the cache where the files downloaded by the given build should be placed.
-    This cache is kept across builds to avoid downloading the same files over and over.
+def get_download_cache(build: stdlib.Build) -> str:
+    """Returns a path pointing to the cache where the files downloaded by the given build should be stored.
+
+    :info: This cache is kept across builds to avoid downloading the same files over and over.
+    :param build: The build associated with the cache
+    :returns: The path pointing to the cache where the downloaded files should be stored
     """
     return os.path.join(
         get_args().cache_dir,
@@ -38,10 +42,11 @@ def get_download_cache(build: stdlib.Build):
     )
 
 
-def get_build_cache(build: stdlib.Build):
-    """
-    Returns the location of the cache where all the packages are built. It is also the place where the downloaded files
-    are copied and extracted after download.
+def get_build_cache(build: stdlib.Build) -> str:
+    """Returns a path pointing to the cache where the given build should be built.
+
+    :param build: The build associated with the cache
+    :returns: The path pointing to the cache where the build is built
     """
     return os.path.join(
         get_args().cache_dir,
@@ -51,11 +56,14 @@ def get_build_cache(build: stdlib.Build):
     )
 
 
-def get_wrap_cache(package: stdlib.Package):
-    """
-    Returns the location of the cache where the files composing the given package should be placed.
-    When calling Package.wrap(), the content of this cache is compressed into a tarball.
-    The content of this cache mimics a Linux file system.
+def get_wrap_cache(package: stdlib.Package) -> str:
+    """Returns a path pointing to the cache where the files belonging to the given package should be stored.
+
+    When the build is over, all files in the cache will be wrapped to form the package's content.
+
+    :info: The content of this cache mimics a Linux file system.
+    :param package: The package associated with the cache
+    :returns: The path pointing to the cache where the files belonging to the given package should be stored
     """
     return os.path.join(
         get_args().cache_dir,
@@ -67,10 +75,14 @@ def get_wrap_cache(package: stdlib.Package):
     )
 
 
-def get_package_cache(package: stdlib.Package):
-    """
-    Returns the location of the cache where the final package, at the very end of the build process, should be placed.
-    This cache is populated by Package.wrap() and contains the manifest and data of the package.
+def get_package_cache(package: stdlib.Package) -> str:
+    """Returns a path pointing to the cache where the final package, at the very end of the build process, should be stored.
+
+    This cache is populated automatically at the end of the build process. A build manifest shouldn't have to write anything to it.
+
+    :info: This cache is populated by Package.wrap() and contains the manifest and data of the package.
+    :param package: The package associated with the cache
+    :returns: The path pointing to the cache where the files belonging to the given package should be stored
     """
     return os.path.join(
         get_args().output_dir,
@@ -82,9 +94,7 @@ def get_package_cache(package: stdlib.Package):
 
 
 def purge_cache():
-    """
-    Purges the content of the `wrap`, `build`, `download` and `install` cache for all builds.
-    """
+    """Purges the content of the `wrap`, `build`, `download` and `install` cache for all builds."""
     folder = get_args().cache_dir
 
     for file in os.listdir(folder):

@@ -23,4 +23,4 @@ VOLUME /app/manifests
 # Packages (output)
 VOLUME /app/packages
 
-CMD ./nbuild.py
+CMD bash

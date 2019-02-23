@@ -23,4 +23,4 @@ class License(Enum):
     PUBLIC_DOMAIN = 'Public Domain'
 
     CUSTOM = 'Custom'
-    NONE = 'None',
+    NONE = 'None'

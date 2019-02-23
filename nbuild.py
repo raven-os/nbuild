@@ -5,8 +5,8 @@
 import os
 import re
 import importlib.util
-import core
-import stdlib
+import core.args
+import stdlib.log
 from dotenv import load_dotenv
 from multiprocessing import cpu_count
 
@@ -17,9 +17,9 @@ def main():
     if core.args.get_args().purge:
         from core.cache import purge_cache
 
-        print("Purging cache... ", end='')
+        stdlib.log.ilog("Purging caches... ")
         purge_cache()
-        print("Done!")
+        stdlib.log.slog("Caches purged!")
         exit(0)
 
     if core.args.get_args().manifest is None:

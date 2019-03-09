@@ -47,7 +47,7 @@ class PackageId():
     def full_name(self) -> str:
         """Return a string representing the full name of the package, which is the combination of its repository, category and name.
 
-        :return: A string representing The full name of the package
+        :return: A string representing the full name of the package
         """
         return f'{self.repository}::{self.category}/{self.name}'
 
@@ -62,7 +62,7 @@ class Package():
     :param description: A description of the package. This description should start with an uppercase letter and finish with a dot.
         If ``None`` is given, the description is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
-    :param tags: A list of tags helping a user find the built packages easily. Each tag should be in ``snake-case``.
+    :param tags: A list of tags helping a user to find the built packages easily. Each tag should be in ``snake-case``.
         If ``None`` is given, the list of tags is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
     :param maintainer: The email address of the maintainer of this build manifest.
@@ -74,7 +74,7 @@ class Package():
     :param upstream_url: An URL pointing to the home page of the software.
         If ``None`` is given, the url is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
-    :param run_dependencies: A dictionnary of runtime dependencies. The key is a package full name, and the value is a version requirement.
+    :param run_dependencies: A dictionary of runtime dependencies. The key is a package's full name, and the value is a version requirement.
         The default value is ``dict()``.
 
     :ivar id: The unique identifier of the package, including its name, category, repository and version.
@@ -83,7 +83,7 @@ class Package():
     :ivar description: A description of the package.
     :vartype description: ``str``
 
-    :ivar tags: A list of tags helping a user find the built packages easily.
+    :ivar tags: A list of tags helping a user to find the built packages easily.
     :vartype tags: ``List`` [ ``str`` ]
 
     :ivar maintainer: The email address of the maintainer of this build manifest.
@@ -95,7 +95,7 @@ class Package():
     :ivar upstream_url: An URL pointing to the home page of the software.
     :vartype upstream_url: ``str``
 
-    :ivar run_dependencies: A dictionnary of runtime dependencies. The key is a package full name, and the value is a version requirement.
+    :ivar run_dependencies: A dictionary of runtime dependencies. The key is a package's full name, and the value is a version requirement.
     :vartype run_dependencies: ``Dict`` [ ``str``, ``str`` ]
 
     :ivar wrap_cache: The path pointing to the cache where the files that belong to this package should be placed before the package is wrapped.

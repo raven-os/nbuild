@@ -59,7 +59,7 @@ class Build():
             shutil.rmtree(self.install_cache)
         os.makedirs(self.install_cache)
 
-        # Call the parent's manifest instrutions
+        # Call the parent's manifest instructions
         return self.manifest.instructions(self)
 
 

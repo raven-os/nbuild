@@ -15,7 +15,7 @@ Those :py:class:`.Build` s will take as parameter (among other things) the set o
 For example, it may have a field named ``url`` holding an URL pointing to the source code of the software.
 Therefore, this field will hold the correct URL for all versions and is easily accessible in a uniform, version-independant way.
 
-*Exemple of an illustrated versionized list of arguments:*
+*Example of an illustrated versionized list of arguments:*
 
 +---------+-----------------------------------------------+----------------------------------------------+
 | Version | Value of the field ``url``                    | Value of the field ``sha256``                |
@@ -45,7 +45,7 @@ class BuildManifestMetadata():
     :param name: The name of the software being built. The name should be in ``snake-case``.
     :param category: The category the built packages belong to. The category should be in ``snake-case``.
     :param description: A description of the software being built. This description should start with an uppercase letter and finish with a dot.
-    :param tags: A list of tags helping a user find the built packages easily. Each tag should be in ``snake-case``.
+    :param tags: A list of tags helping a user to find the built packages easily. Each tag should be in ``snake-case``.
     :param maintainer: The email address of the maintainer of this build manifest.
     :param licenses: The licenses of the built software.
     :type licenses: ``List`` [ :py:class:`.License` ]
@@ -60,7 +60,7 @@ class BuildManifestMetadata():
     :ivar description: A description of the software being built.
     :vartype description: ``str``
 
-    :ivar tags: A list of tags helping a user find the built packages easily.
+    :ivar tags: A list of tags helping a user to find the built packages easily.
     :vartype tags: ``List`` [ ``str`` ]
 
     :ivar maintainer: The email address of the maintainer of this build manifest.
@@ -103,19 +103,19 @@ class BuildManifest():
     **Versionized Arguments:**
 
     The field ``versionized_args`` is a list. Each entry in this list represents a new version of the software.
-    The entries are a dictionnary holding the build's arguments for each version.
+    The entries are a dictionary holding the build's arguments for each version.
 
     It must have a key named ``semver`` that holds the version number, following `Semantic Versioning 2.0.0`_.
 
     All the remaining pairs of key/value can be used freely. Some functions of the standard compilation library (:py:mod:`stdlib`)
     may use them as generic, version-agnostic arguments. To ensure future compatibility, the standard compilation library reserves
-    all key names that doesn't start with an underscore (``_``).
+    all key names that don't start with an underscore (``_``).
 
     For example, the function :py:func:`stdlib.fetch.fetch_data` is used to download files (like the source code) before building a software.
     It looks for an entry named ``fetch_url`` in ``versionized_args`` that contains the elements needed to download a file (its URL, its hash etc.)
     (See the documentation of :py:func:`stdlib.fetch.fetch_data` for more informations.)
 
-    Here is an exemple of ``versionized_args`` for a build manifest supporting two versions (``1.0.0`` and ``1.1.0``) of the software
+    Here is an example of ``versionized_args`` for a build manifest supporting two versions (``1.0.0`` and ``1.1.0``) of the software
     and uses the function :py:func:`stdlib.fetch.fetch_data` to download the source code::
 
         [
@@ -138,7 +138,7 @@ class BuildManifest():
     .. _Semantic Versioning 2.0.0: https://semver.org/spec/v2.0.0.html
 
     :param metadata: A set of values used as a reference when filling the metadata of the built packages
-    :param versionized_args: A list of dictionnaries used as a generic way to give arguments for each versions of the build.
+    :param versionized_args: A list of dictionaries used as a generic way to give arguments to each versions of the build.
         See the above explanations for its exact structure and limitations.
     :param instructions: A callable (usually a python function) that builds the packages. It takes a :py:class:`~stdlib.build.Build` as parameter
         and returns an iterator over a list of :py:class:`~stdlib.package.Package` (usually a list).
@@ -147,7 +147,7 @@ class BuildManifest():
     :ivar metadata: A set of values used as a reference when filling the metadata of the built packages
     :vartype metadata: :py:class:`~BuildManifestMetadata`
 
-    :ivar versionized_args: A list of dictionnaries used as a generic way to give arguments for each versions of the build.
+    :ivar versionized_args: A list of dictionaries used as a generic way to give arguments to each versions of the build.
     :vartype versionized_args: ``List`` [ ``Dict`` [ ``str``, ``str`` ] ]
 
     :ivar instructions: A callable that builds the package.
@@ -181,13 +181,13 @@ def manifest(
     build_dependencies: List[str] = [],
     **kwargs,
 ):
-    """Create a :py:class:`.BuildManifest` and executes all the builds generated.
+    """Create a :py:class:`.BuildManifest` and execute all the builds generated.
 
     First, this function will create an instance of :py:class:`.BuildManifest` with the given metadata.
     Then it will install the build dependencies needed to compile the software.
     For all versions in the build manifest, a :py:class:`.Build` instance is
     created and executed (using :py:func:`stdlib.build.Build.build`).
-    At the end, all the retrieved packets are wrapped using :py:func:`stdlib.package.Package.wrap`.
+    At the end, all the retrieved packages are wrapped using :py:func:`stdlib.package.Package.wrap`.
 
     :info: The environment and current working directory is saved before each build, limiting the impact of one build on an other.
     :info: See the constructor of :py:class:`~stdlib.manifest.BuildManifest` and :py:class:`.BuildManifestMetadata`
@@ -195,7 +195,7 @@ def manifest(
     :info: The packages ``stable::raven-os/essentials`` and ``stable::raven-os/essentials-dev`` are guaranteed to be installed.
         There is no need to include them in ``build_dependencies``.
 
-    :param kwargs: Arguments transfered to the constructor of :py:class:`.BuildManifestMetadata`
+    :param kwargs: Arguments transferred to the constructor of :py:class:`.BuildManifestMetadata`
     :param versions_data: Versionized arguments of the build manifest.
     :param build_dependencies: A list of package requirements that must be installed (using ``nest``) before building anything.
     """

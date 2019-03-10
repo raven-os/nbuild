@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
-"""Provide a function to save the current environment for the duration of a new context."""
+"""Provides a function to save the current environment for the duration of a new context."""
 
 import os
 from copy import deepcopy

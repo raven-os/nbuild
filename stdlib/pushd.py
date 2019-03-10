@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
-"""Provide a function to save the current working directory and switch to the given one for the duration of a new context."""
+"""Provides a function to save the current working directory and switch to the given one for the duration of a new context."""
 
 import os
 from contextlib import contextmanager

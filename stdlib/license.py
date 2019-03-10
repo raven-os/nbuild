@@ -1,12 +1,12 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
-"""An enumeration of possible a softwares' licenses."""
+"""An enumeration of possible software licenses."""
 
 from enum import Enum
 
 
 class License(Enum):
-    """An enumeration of a softwares' licenses.
+    """An enumeration of software licenses.
 
     :info: This enumeration is of course incomplete, and will be completed when necessary.
     """

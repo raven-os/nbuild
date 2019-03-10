@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
-"""Provide a function to execute shell commands."""
+"""Provides a way to execute shell commands."""
 
 import os
 import core
@@ -16,10 +16,10 @@ def cmd(
 
     If the command fails and unless ``fail_ok`` is ``True``, the execution of the build manifest is aborted.
 
-    :note: :py:func:`.cmd` doesn't return until the shell command finishes.
+    :note: :py:func:`.cmd` doesn **not** return until the command finishes.
 
     :param cmd: The shell command to execute.
-    :param fail_ok: Indicate whether or not to abort if the command returns a value different than 0.
+    :param fail_ok: Indicate whether or not to abort if the command returns a value different than ``0``.
     """
 
     if core.args.get_args().verbose >= 1:

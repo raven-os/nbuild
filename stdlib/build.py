@@ -60,6 +60,7 @@ class Build():
         os.makedirs(self.install_cache)
 
         # Call the parent's manifest instructions
+        os.chdir(self.build_cache)
         return self.manifest.instructions(self)
 
 

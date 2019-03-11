@@ -12,8 +12,8 @@ It is typically made of three main parts:
 The build manifest can then generate a list of :py:class:`.Build` for each version in the versionized arguments.
 Those :py:class:`.Build` s will take as parameter (among other things) the set of data associated with this version.
 
-For example, it may have a field named ``url`` holding an URL pointing to the source code of the software.
-Therefore, this field will hold the correct URL for all versions and is easily accessible in a uniform, version-independant way.
+For example, it may have a field named ``url`` holding a URL pointing to the source code of the software.
+Therefore, this field will hold the correct URL for all versions and is easily accessible in a uniform, version-independent way.
 
 *Example of an illustrated versionized list of arguments:*
 
@@ -37,10 +37,10 @@ from typing import List, Dict
 class BuildManifestMetadata():
     """A set of values used as a reference when filling the metadata of the built packages
 
-    Built packages will reuse these information to build their own metadata.
-    For example, the developper version of a package might reuse the name provided and append ``-dev`` at the end.
+    Built packages will reuse this information to build their own metadata.
+    For example, the developer version of a package might reuse the name provided and append ``-dev`` at the end.
 
-    :info: The information provided here can be overriden on a package-per-package basis. They are only here as a default option.
+    :info: The information provided here can be overriden on a per-package basis. They are only here as a default option.
 
     :param name: The name of the software being built. The name should be in ``snake-case``.
     :param category: The category the built packages belong to. The category should be in ``snake-case``.
@@ -141,8 +141,8 @@ class BuildManifest():
     :param versionized_args: A list of dictionaries used as a generic way to give arguments to each versions of the build.
         See the above explanations for its exact structure and limitations.
     :param instructions: A callable (usually a python function) that builds the packages. It takes a :py:class:`~stdlib.build.Build` as parameter
-        and returns an iterator over a list of :py:class:`~stdlib.package.Package` (usually a list).
-    :type instructions: fn (:py:class:`~stdlib.build.Build`) -> List[:py:class:`~stdlib.package.Package`]
+        and returns an iterable collection of :py:class:`~stdlib.package.Package` (usually a list).
+    :type instructions: fn (:py:class:`~stdlib.build.Build`) -> ``Iterable`` [ :py:class:`~stdlib.package.Package` ]
 
     :ivar metadata: A set of values used as a reference when filling the metadata of the built packages
     :vartype metadata: :py:class:`~BuildManifestMetadata`
@@ -151,7 +151,7 @@ class BuildManifest():
     :vartype versionized_args: ``List`` [ ``Dict`` [ ``str``, ``str`` ] ]
 
     :ivar instructions: A callable that builds the package.
-    :vartype instructions: fn (:py:class:`~stdlib.build.Build`) -> List[:py:class:`~stdlib.package.Package`]
+    :vartype instructions: fn (:py:class:`~stdlib.build.Build`) -> ``Iterable`` [ :py:class:`~stdlib.package.Package` ]
     """
     def __init__(
         self,
@@ -166,14 +166,14 @@ class BuildManifest():
     def builds(self):
         """Aggregate all the builds for this manifest into a list, one per version.
 
-        :returns: A lit of all the builds for this manifest, one per version.
+        :returns: A list of all the builds for this manifest, one per version.
         :returntype: ``List`` [ :py:class:`.Build` ]
         """
         from stdlib.build import Build
-        return map(
+        return list(map(
             lambda args: Build(self, args),
             self.versionized_args,
-        )
+        ))
 
 
 def manifest(
@@ -189,7 +189,7 @@ def manifest(
     created and executed (using :py:func:`stdlib.build.Build.build`).
     At the end, all the retrieved packages are wrapped using :py:func:`stdlib.package.Package.wrap`.
 
-    :info: The environment and current working directory is saved before each build, limiting the impact of one build on an other.
+    :info: The environment and current working directory are saved before each build, limiting the impact of one build on another.
     :info: See the constructor of :py:class:`~stdlib.manifest.BuildManifest` and :py:class:`.BuildManifestMetadata`
         for the exact meaning and limitation of ``kwargs`` and ``versions_data``.
     :info: The packages ``stable::raven-os/essentials`` and ``stable::raven-os/essentials-dev`` are guaranteed to be installed.

@@ -122,3 +122,4 @@ dmypy.json
 /docs/source/core*.rst
 /docs/source/nbuild*.rst
 /docs/source/stdlib*.rst
+/docs/source/modules.rst

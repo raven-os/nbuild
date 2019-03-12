@@ -1,4 +1,6 @@
-# Nest Build - Automated package builder for lazy maintainers
+# Nest Build 
+
+*An automated package builder for lazy maintainers.*
 
 ## Dependencies
 

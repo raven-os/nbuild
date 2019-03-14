@@ -13,7 +13,7 @@ from typing import List, Dict
 from termcolor import colored
 
 
-class PackageId():
+class PackageID():
     """The unique identifier of a package: its repository, category, name and version.
 
     :param name: The name of the package. The name should be in ``snake-case``.
@@ -106,7 +106,7 @@ class Package():
     """
     def __init__(
         self,
-        id: PackageId,
+        id: PackageID,
         description: str = None,
         tags: List[str] = None,
         maintainer: str = None,
@@ -139,7 +139,7 @@ class Package():
 
     def wrap(self):
         """Wrap the package by creating all the files needed by the repository (``nest-server``) to publish the package and putting
-        them in the path pointed by ``self.package_cache``
+        them in the path referred to by ``self.package_cache``
         """
         stdlib.log.slog(f"Wrapping {self.id} ({self.wrap_cache})")
 

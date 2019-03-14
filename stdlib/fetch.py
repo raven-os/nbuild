@@ -14,15 +14,15 @@ from urllib.parse import urlparse
 def fetch():
     """Fetch the input data contained in the versionized argument ``fetch``.
 
-    The versionized argument ``fetch`` must be an array of dictionnaries. Each entry in the array is a data to fetch.
-    The dictionnary indicates how to retrieve the data and some optional parameters.
+    The versionized argument ``fetch`` must be an array of dictionaries. Each entry in the array is a data to fetch.
+    The dictionary indicates how to retrieve the data and some optional parameters.
 
-    If the dictionnary contains the key:
+    If the dictionary contains the key:
 
         * ``url``: the function :py:func:`.fetch_url` is called with the remaining values as arguments.
         * ``file``: the function :py:func:`.fetch_file` is called with the remaining values as arguments.
 
-    If the dictionary contains both the key ``url`` and ``file``, the behaviour of the function is undefined.
+    If the dictionary contains both the key ``url`` and ``file``, a ``RuntimeError`` is raised.
 
     *Example:* ::
 
@@ -36,7 +36,7 @@ def fetch():
             },
         ]
 
-    With the above example, ``fetch`` will do those calls, respectively: ::
+    With the above example, ``fetch`` will perform these calls, respectively: ::
 
         fetch_url(
             url='https://example.com/hello.tar.gz',
@@ -53,18 +53,19 @@ def fetch():
     inputs = build.args.get('fetch', [])
 
     for input in inputs:
-        if 'url' in input:
-            fetch_url(**input)
-        elif 'file' in input:
-            fetch_file(**input)
+        if ('url' in input) ^ ('file' in input):
+            if 'url' in input:
+                fetch_url(**input)
+            elif 'file' in input:
+                fetch_file(**input)
         else:
-            print("Bouuuh")
+            raise RuntimeError("A single entry of data given to fetch() contains either no `url` or `file` key, or both of them.")
 
 
 def fetch_file(file: str):
-    """Copy a file or directory tothe current build cache.
+    """Copy a file or directory to the current build cache.
 
-    :note: The path must be relative to the build manifest. If an aboslute path is given, a ``RuntimError`` is raised.
+    :note: The path must be relative to the build manifest. If an absolute path is given, a ``RuntimeError`` is raised.
 
     :param file: The file or directory to copy.
     """

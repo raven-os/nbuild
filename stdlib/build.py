@@ -6,7 +6,7 @@
 
 import os
 import shutil
-from typing import Dict
+from typing import Dict, Iterable
 
 _current_build = None
 
@@ -29,7 +29,7 @@ class Build():
         self.args = args
 
         self.semver = self.args['semver']
-        (self.major, self.minor, self.patch) = self.args['semver'].split('.')
+        self.major, self.minor, self.patch = self.args['semver'].split('.')
 
         from core.cache import get_download_cache, get_build_cache, get_install_cache
         self.download_cache = get_download_cache(self)
@@ -42,9 +42,9 @@ class Build():
     def build(self):
         """Set the current build to ``self`` and execute the instructions contained in the :py:class:`.BuildManifest`.
 
-        :returns: An iterator over a list of :py:class:`.Package` s.
+        :returns: An iterable collection of :py:class:`.Package` s, like a ``List``.
             It forwards the return value of the instructions contained in the :py:class:`.BuildManifest`.
-        :returntype: ``List`` [ :py:class:`.Package` ]
+        :returntype: ``Iterable`` [ :py:class:`.Package` ]
         """
         _set_current_build(self)
 
@@ -60,6 +60,7 @@ class Build():
         os.makedirs(self.install_cache)
 
         # Call the parent's manifest instructions
+        os.chdir(self.build_cache)
         return self.manifest.instructions(self)
 
 

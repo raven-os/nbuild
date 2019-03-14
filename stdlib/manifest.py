@@ -111,38 +111,44 @@ class BuildManifest():
     may use them as generic, version-agnostic arguments. To ensure future compatibility, the standard compilation library reserves
     all key names that don't start with an underscore (``_``).
 
-    For example, the function :py:func:`stdlib.fetch.fetch_data` is used to download files (like the source code) before building a software.
-    It looks for an entry named ``fetch_url`` in ``versionized_args`` that contains the elements needed to download a file (its URL, its hash etc.)
-    (See the documentation of :py:func:`stdlib.fetch.fetch_data` for more informations.)
+    For example, the function :py:func:`stdlib.fetch.fetch` is used to download files (like the source code) before building a software.
+    It looks for an entry named ``fetch`` in ``versionized_args`` that contains the elements needed to download a file (like its URL, its hash etc.)
+    (See the documentation of :py:func:`stdlib.fetch.fetch` for more informations.)
 
     Here is an example of ``versionized_args`` for a build manifest supporting two versions (``1.0.0`` and ``1.1.0``) of the software
-    and uses the function :py:func:`stdlib.fetch.fetch_data` to download the source code::
+    and uses the function :py:func:`stdlib.fetch.fetch` to download the source code::
 
         [
             {
                 'semver': '1.0.0',
-                'fetch_url': {
-                    'url': 'http://example.com/dl/hello_world_1.0.0.tar.gz',
-                    'sha256': '5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03',
-                },
+                'fetch': [{
+                        'url': 'http://example.com/dl/hello_world_1.0.0.tar.gz',
+                        'sha256': '5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03',
+                    }
+                ],
             },
             {
                 'semver': '1.1.0',
-                'fetch_url': {
-                    'url': 'http://example.com/dl/hello_world_1.1.0.tar.gz',
-                    'sha256': 'e258d248fda94c63753607f7c4494ee0fcbe92f1a76bfdac795c9d84101eb317',
-                },
+                'fetch': [{
+                        'url': 'http://example.com/dl/hello_world_1.1.0.tar.gz',
+                        'sha256': 'e258d248fda94c63753607f7c4494ee0fcbe92f1a76bfdac795c9d84101eb317',
+                    },
+                ]
             }
         ]
 
     .. _Semantic Versioning 2.0.0: https://semver.org/spec/v2.0.0.html
 
+    :param path: The path where the build manifest is stored
     :param metadata: A set of values used as a reference when filling the metadata of the built packages
     :param versionized_args: A list of dictionaries used as a generic way to give arguments to each versions of the build.
         See the above explanations for its exact structure and limitations.
     :param instructions: A callable (usually a python function) that builds the packages. It takes a :py:class:`~stdlib.build.Build` as parameter
         and returns an iterable collection of :py:class:`~stdlib.package.Package` (usually a list).
     :type instructions: fn (:py:class:`~stdlib.build.Build`) -> ``Iterable`` [ :py:class:`~stdlib.package.Package` ]
+
+    :ivar path: The path where the build manifest is stored
+    :vartype path: ``str``
 
     :ivar metadata: A set of values used as a reference when filling the metadata of the built packages
     :vartype metadata: :py:class:`~BuildManifestMetadata`
@@ -155,6 +161,7 @@ class BuildManifest():
     """
     def __init__(
         self,
+        path: str,
         metadata: BuildManifestMetadata,
         versionized_args: List[Dict[str, str]],
         instructions,
@@ -162,6 +169,7 @@ class BuildManifest():
         self.metadata = metadata
         self.versionized_args = versionized_args
         self.instructions = instructions
+        self.path = path
 
     def builds(self):
         """Aggregate all the builds for this manifest into a list, one per version.
@@ -201,7 +209,12 @@ def manifest(
     """
     def exec_manifest(builder):
         metadata = BuildManifestMetadata(**kwargs)
-        manifest = BuildManifest(metadata, versions_data, builder)
+        manifest = BuildManifest(
+            core.args.get_args().manifest,
+            metadata,
+            versions_data,
+            builder,
+        )
 
         # Install build dependencies
         for build_dep in build_dependencies:

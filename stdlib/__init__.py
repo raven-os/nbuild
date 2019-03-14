@@ -6,3 +6,4 @@
 from stdlib.license import License
 from stdlib.pushd import pushd
 from stdlib.pushenv import pushenv
+from stdlib.cmd import cmd

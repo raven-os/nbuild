@@ -31,7 +31,7 @@ def man_installed(package: Package, man_section=-1):
         return False
     elif os.path.isdir(path):
         for i in range(0, 8):
-            if i == man_section and os.path.isdir(f'{path}{i}'):
+            if i == man_section and os.path.isdir(f'{path}/man{i}'):
                 elog(f"The manuals {str(i)} should not be installed for the package "
                      f"{package.id}.")
                 return False

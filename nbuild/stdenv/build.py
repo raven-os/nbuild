@@ -41,7 +41,7 @@ class Build():
         os.makedirs(self.build_dir, exist_ok=True)
 
         for (i, package) in enumerate(self.packages):
-            clog(f"Building ({1}/{nb_packages}) - {package}", indent=False)
+            clog(f"Building ({i}/{nb_packages}) - {package}", indent=False)
             self.current_package = package
             package.build()
             if not get_args().no_sanity_checks:

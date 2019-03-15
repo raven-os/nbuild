@@ -39,12 +39,6 @@ def parse_args():
         help="Make the operation more talkative",
     )
     nbuild_parser.add_argument(
-        '-C',
-        '--check',
-        nargs='*',
-        help="Check the validity of an already built package",
-    )
-    nbuild_parser.add_argument(
         '--no-sanity-checks',
         action='store_true',
         help="Don't run the sanity checks.",

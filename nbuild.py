@@ -1,27 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import importlib.util
 import os
+import importlib.util
 from nbuild.args import parse_args, get_args, get_parser
 from nbuild.log import flog, elog
 from nbuild.stdenv.build import Build, current_build, set_current_build
 from nbuild.checks import check_package
-
-
-def load_manifest(manifest_path):
-    spec = importlib.util.spec_from_file_location(
-        "build_manifest",
-        manifest_path
-    )
-
-    if not spec:
-        flog(
-            "Failed to load Build Manifest "
-            f"located at path \"{manifest_path}\""
-        )
-        exit(1)
-    return spec
+from nbuild.manifest import load_manifest
 
 
 def main():

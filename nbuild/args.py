@@ -52,9 +52,16 @@ def parse_args():
     nbuild_args = nbuild_parser.parse_args()
 
 
+def set_args(args):
+    global nbuild_args
+    nbuild_args = args
+
+
 def get_args():
+    global nbuild_args
     return nbuild_args
 
 
 def get_parser():
+    global nbuild_parser
     return nbuild_parser

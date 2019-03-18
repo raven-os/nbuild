@@ -10,9 +10,10 @@ import glob
 def patch(
     path: str,
 ):
-    """Apply the patch pointed by ``path`` on the code base.
+    """Apply the patch pointed to by ``path`` on the code base.
 
     :note: The patch must be a compatible input for the GNU ``patch`` utility.
+    :note: Patch that appeared to already be applied are ignored
 
     :param path: The path pointing to the patch file. It must be relative to the current directory.
     """
@@ -24,7 +25,7 @@ def patch_all():
     """Apply all patches of the current directory on the code base.
 
     :note: All patches must be a compatible input for the GNU ``patch`` utility.
-    :note: The patches must be ``.patch`` file to be automatically picked up by this function.
+    :note: The patches must be ``.patch`` files to be automatically picked up by this function.
     """
 
     for patch_path in glob.glob('*.patch'):

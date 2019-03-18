@@ -10,7 +10,7 @@ import glob
 def patch(
     path: str,
 ):
-    """Apply the patch pointed by ``path`` on the code base.
+    """Apply the patch pointed to by ``path`` on the code base.
 
     :note: The patch must be a compatible input for the GNU ``patch`` utility.
 

@@ -13,6 +13,7 @@ def patch(
     """Apply the patch pointed to by ``path`` on the code base.
 
     :note: The patch must be a compatible input for the GNU ``patch`` utility.
+    :note: Patch that appeared to already be applied are ignored
 
     :param path: The path pointing to the patch file. It must be relative to the current directory.
     """

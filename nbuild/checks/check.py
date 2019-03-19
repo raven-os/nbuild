@@ -4,7 +4,7 @@ from nbuild.checks.executable import check_exec
 from nbuild.log import ilog
 from nbuild.checks.syntax_check import check_syntax
 from nbuild.checks.suffix_check import suffix_checks
-from nbuild.checks.move_file_split import move_file_split
+from nbuild.checks.move_files_split import move_files_split
 
 
 def find_dirs_ending_in(end, path):
@@ -24,5 +24,5 @@ def check_package(pkg):
         check_deps(pkg)
         check_exec(pkg)
     suffix_checks(pkg)
-    move_file_split(pkg, suffix)
+    move_files_split(pkg, suffix)
     ilog("All checks done")

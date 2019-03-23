@@ -6,12 +6,12 @@ build packages of a certain type.
 There are different kinds of template:
 
   * **Partial templates**: templates that provide only **a chunk** of the overall build process, like a
-    template that wraps a specific build system but don't download any source code or generate
+    template that wraps a specific build system but doesn't download any source code or generate
     any package.
 
-    They are usualy used as a sub-part of an *exhaustive template*.
+    They are usually used as a sub-part of an *exhaustive template*.
 
-    Example of partial templates:
+    Examples of partial templates:
         * :py:mod:`.configure`
         * :py:mod:`.make`
 

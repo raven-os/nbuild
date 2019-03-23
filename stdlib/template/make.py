@@ -13,7 +13,7 @@ def make(
 ):
     """Run ``make``.
 
-    :note: Targets are all executed by one instance of ``make``, therefore they are run in parallel.
+    :note: Targets are each executed by one instance of ``make``, therefore they are run in parallel.
 
     :param targets: The targets to run.
     :param binary: The command or path to use. The default value is ``make``.

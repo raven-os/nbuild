@@ -41,7 +41,7 @@ def get_dir_flags() -> List[str]:
 def get_feature_flags() -> List[str]:
     """Build a list of feature flags used by the :py:func:`.configure` template.
 
-    The return value is a list of feature flags that enable parts of the target software based
+    The return value is a list of feature flags that enables parts of the target software based
     on the available dependencies.
 
     For example, it will provide flags like::
@@ -80,9 +80,9 @@ def configure(
 ):
     """Run ``./configure`` with a specific set of arguments.
 
-    The flags given to configure are both the return value of :py:func:`.get_flags()` and the given ``flags``.
+    The flags given to the configure script are both the return value of :py:func:`.get_flags()` and the given ``flags``.
 
-    Some configure script abort on unknown flags. If ``system_flags`` is ``False``, the default system flags
+    Some configure scripts abort on unknown flags. If ``system_flags`` is ``False``, the default system flags
     usually provided by this template won't be infused in the final call, making it more flexible for such
     configure scripts.
 
@@ -90,7 +90,7 @@ def configure(
     rebuilding them by hand and taking the risk of missing some of them.
 
     Even if ``system_flags`` is ``False``, some core flags will remain infused.
-    If such flags are the cause of any errors from the configure script, it is recommended to run ``./configure``
+    If such flags are the cause of any error from the configure script, it is recommended to run ``./configure``
     manually, using :py:func:`~stdlib.cmd.cmd`.
 
     :note: The prefix used is ``/usr`` (as returned by :py:func:`.get_dir_flags`). Therefore, the environment variable

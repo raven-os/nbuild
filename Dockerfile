@@ -17,6 +17,9 @@ WORKDIR /app
 # Install nbuild
 ADD . /app
 
+# Some nice aliases
+RUN echo "alias ls='ls --color'\nalias la='ls -la'" >> /root/.bashrc
+
 # Manifests (entry)
 VOLUME /app/manifests
 

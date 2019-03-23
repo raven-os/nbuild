@@ -26,7 +26,7 @@ def build(
     split=None,
     deplinker=None,
 ):
-    """Downloads, builds and wraps a library based on ``autoconf`` and ``make``.
+    """Download, build and wrap a library based on ``autoconf`` and ``make``.
 
     This exhaustive template is made of 9 steps:
         * ``fetch``
@@ -80,7 +80,7 @@ def build(
         This step installs the software in the install cache. The default value is :py:func:`.make` with the arguments ``'install'`` and
         ``f'DESTDIR={stdlib.build.current_build().install_cache}'``
 
-        If this step is overwritten, the ``DESTDIR`` variable is crucial and should be reused. Otherwise, and unless the ``configure`` script has been
+        If this step is overriden, the ``DESTDIR`` variable is crucial and should be reused. Otherwise, and unless the ``configure`` script has been
         configured to work without it, the installation can damage and overwrite parts of the host system.
 
     **Split**

@@ -41,7 +41,7 @@ def get_dir_flags() -> List[str]:
 def get_feature_flags() -> List[str]:
     """Build a list of feature flags used by the :py:func:`.configure` template.
 
-    The return value is a list of feature flags that enables parts of the target software based
+    The return value is a list of feature flags that enable parts of the target software based
     on the available dependencies.
 
     For example, it will provide flags like::
@@ -97,7 +97,7 @@ def configure(
         ``DESTDIR`` **must** be set (pointing to the install cache of the current build) when installing the built software.
         Otherwise, the installation can damage and overwrite parts of the host system.
 
-    :note: Because ``flags`` is appended at the end of the argument list, it overwrites any system-wide flags. This is useful
+    :note: Because ``flags`` is appended at the end of the argument list, it overrides any system-wide flags. This is useful
         to easily disable a feature or package  with its ``--without-PACKAGE``/``--disable-FEATURE`` equivalent.
 
     :param flags: A list of flags to give to the configure script.

@@ -80,9 +80,9 @@ def configure(
 ):
     """Run ``./configure`` with a specific set of arguments.
 
-    The flags given to configure are both the return value of :py:func:`.get_flags()` and the given ``flags``.
+    The flags given to the configure script are both the return value of :py:func:`.get_flags()` and the given ``flags``.
 
-    Some configure script abort on unknown flags. If ``system_flags`` is ``False``, the default system flags
+    Some configure scripts abort on unknown flags. If ``system_flags`` is ``False``, the default system flags
     usually provided by this template won't be infused in the final call, making it more flexible for such
     configure scripts.
 
@@ -90,14 +90,14 @@ def configure(
     rebuilding them by hand and taking the risk of missing some of them.
 
     Even if ``system_flags`` is ``False``, some core flags will remain infused.
-    If such flags are the cause of any errors from the configure script, it is recommended to run ``./configure``
+    If such flags are the cause of any error from the configure script, it is recommended to run ``./configure``
     manually, using :py:func:`~stdlib.cmd.cmd`.
 
     :note: The prefix used is ``/usr`` (as returned by :py:func:`.get_dir_flags`). Therefore, the environment variable
         ``DESTDIR`` **must** be set (pointing to the install cache of the current build) when installing the built software.
         Otherwise, the installation can damage and overwrite parts of the host system.
 
-    :note: Because ``flags`` is appended at the end of the argument list, it overwrites any system-wide flags. This is useful
+    :note: Because ``flags`` is appended at the end of the argument list, it overrides any system-wide flags. This is useful
         to easily disable a feature or package  with its ``--without-PACKAGE``/``--disable-FEATURE`` equivalent.
 
     :param flags: A list of flags to give to the configure script.

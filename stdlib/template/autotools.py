@@ -26,7 +26,7 @@ def build(
     split=None,
     deplinker=None,
 ):
-    """Downloads, build and wraps a library based on ``autoconf`` and ``make``.
+    """Download, build and wrap a library based on ``autoconf`` and ``make``.
 
     This exhaustive template is made of 9 steps:
         * ``fetch``
@@ -39,9 +39,9 @@ def build(
         * ``split``
         * ``dependency linking``
 
-    For each one of these steps, a function is called. This template simply calls all of them in the above order.
-    All of those functions can be given as arguments, but each one of them have a default value that is explained below.
-    If any of these function is ``None``, the step is skipped.
+    For each one of these steps, a function is called. This template simply calls each of them in the above order.
+    All of these functions can be given as arguments, but each one of them has a default value that is explained below.
+    If any of those functions is ``None``, the step is skipped.
 
     **Fetch**
 
@@ -55,7 +55,7 @@ def build(
 
         This step is used to patch the downloaded source code. The default value is :py:func:`.patch_all` with no argument.
 
-    From now one, the current working directory is changed in favor of ``build_folder`` (which defaults to ``.``).
+    From now on, the current working directory is changed in favor of ``build_folder`` (which defaults to ``.``).
     If the directory pointed by ``build_folder`` doesn't exist, it is created.
 
     This is useful for the few ``configure`` scripts that don't work if they aren't executed in a standalone directory.
@@ -80,7 +80,7 @@ def build(
         This step installs the software in the install cache. The default value is :py:func:`.make` with the arguments ``'install'`` and
         ``f'DESTDIR={stdlib.build.current_build().install_cache}'``
 
-        If this step is overwritten, the ``DESTDIR`` variable is crucial and should be reused. Otherwise, and unless the ``configure`` script has been
+        If this step is overriden, the ``DESTDIR`` variable is crucial and should be reused. Otherwise, and unless the ``configure`` script has been
         configured to work without it, the installation can damage and overwrite parts of the host system.
 
     **Split**
@@ -108,7 +108,6 @@ def build(
     os.makedirs(build_folder, exist_ok=True)
     with stdlib.pushd(build_folder):
 
-        print(f"OMG I'M IN {os.getcwd()}")
         os.environ['DESTDIR'] = build.install_cache
 
         stdlib.log.ilog("Step 4/9: Configure")

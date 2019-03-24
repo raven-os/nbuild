@@ -321,7 +321,7 @@ class Package():
             with stdlib.log.pushlog():
                 for root, _, filenames in os.walk('.'):
                     for filename in filenames:
-                        stdlib.log.ilog(__colored_path(os.path.join(root, filename)))
+                        stdlib.log.ilog(_colored_path(os.path.join(root, filename)))
                         files_count += 1
             stdlib.log.ilog(f"(That's {files_count} files.)")
 
@@ -345,11 +345,22 @@ class Package():
             }
             toml.dump(manifest, filename)
 
+        stdlib.log.slog("Creating package.nest")
+        with stdlib.pushd(self.package_cache):
+            nest_file = os.path.join(self.package_cache, 'package.nest')
+            with tarfile.open(nest_file, mode='w') as archive:
+                archive.add('./manifest.toml')
+                archive.add('./data.tar.gz')
+
+            # Remove temporary manifest.toml and data.tar.gz
+            os.remove('./manifest.toml')
+            os.remove('./data.tar.gz')
+
     def __str__(self):
         return str(self.id)
 
 
-def __colored_path(path, pretty_path=None):
+def _colored_path(path, pretty_path=None):
     if pretty_path is None:
         pretty_path = path
 
@@ -359,7 +370,7 @@ def __colored_path(path, pretty_path=None):
             os.readlink(path),
         )
         if os.path.exists(target_path):
-            return f"{colored(path, 'cyan', attrs=['bold'])} -> {__colored_path(target_path, os.readlink(path))}"
+            return f"{colored(path, 'cyan', attrs=['bold'])} -> {_colored_path(target_path, os.readlink(path))}"
         else:
             return f"{colored(path, on_color='on_red', attrs=['bold'])} -> {colored(os.readlink(path), on_color='on_red', attrs=['bold'])}"
     elif os.path.isdir(path):

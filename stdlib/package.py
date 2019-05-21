@@ -9,6 +9,8 @@ import tarfile
 import toml
 import datetime
 import stdlib.log
+import braceexpand
+import glob
 from typing import List, Dict
 from termcolor import colored
 
@@ -112,7 +114,7 @@ class Package():
         maintainer: str = None,
         licenses: List[stdlib.License] = None,
         upstream_url: str = None,
-        run_dependencies: Dict[str, str] = dict(),
+        run_dependencies: Dict[str, str]={},
     ):
         from core.cache import get_wrap_cache, get_package_cache
 
@@ -137,6 +139,175 @@ class Package():
             shutil.rmtree(self.package_cache)
         os.makedirs(self.package_cache)
 
+    def is_empty(self) -> bool:
+        """Test whether the ``wrap_cache`` of this :py:class:`.Package` contains at least a single file.
+
+        :note: If the wrap cache contains only empty directories, this function returns ``False``.
+
+        :returns: ``True`` if the cache contains at least a single file, ``False`` otherwise.
+        """
+        for _, _, filenames in os.walk(self.wrap_cache):
+            if len(filenames):
+                return False
+        return True
+
+    def drain(self, *paths: str):
+        """Drain the current :py:class:`.Build`, moving files from their ``install_cache`` to this
+        :py:class:`.Package`'s ``wrap_cache``.
+
+        This function is mostly used to grab the files that weren't automatically picked up by the package splitter.
+
+        *Example:* ::
+
+            package.drain(
+                'usr/{lib,bin}',
+                'usr/lib64/lib*.so',
+            )
+
+        :note: Files are moved and not copied
+
+        :param paths: The paths pointing to the files to move, relative to the ``install_cache`` of the current :py:class:`.Build`.
+            This argument supports the globbing and braces syntax of common shells.
+        """
+        build = stdlib.build.current_build()
+
+        # Move to source directory
+        with stdlib.pushd(build.install_cache):
+            for rglob in paths:
+                for rglob in braceexpand.braceexpand(paths):  # Expand braces
+
+                    if os.path.isabs(rglob):
+                        raise RuntimeError("Package.drain() received an absolute path as parameter, but it expects a relative one")
+
+                    for rpath in glob.glob(rglob):  # Expand globbing
+                        dstpath = os.path.join(
+                            self.wrap_cache,
+                            os.path.relpath(
+                                rpath,
+                                build.install_cache
+                            ),
+                        )
+
+                        os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
+                        shutil.move(rpath, dstpath)
+
+    def drain_package(self, source, *paths: str):
+        """Drain a :py:class:`.Package`, moving files from its ``wrap_cache`` to this :py:class:`.Package`'s ``wrap_cache``.
+
+        This function is mostly used to grab the files that were wrongly assigned to another package by the package splitter.
+
+        *Example:* ::
+
+            lib_pkg.drain_package(
+                bin_pkg,
+                'usr/lib{32,64}/',
+                'usr/lib/lib*.so',
+            )
+
+        :note: Files are moved and not copied
+
+        :param source: The source package containing the files to drain from.
+        :type source: :py:class:`.Package`
+        :param paths: The paths pointing to the files to move, relative to the ``wrap_cache`` of the given :py:class:`.Package`.
+            This argument supports the globbing and braces syntax of common shells.
+        """
+        with stdlib.pushd(source.wrap_cache):
+            for rglob in paths:
+                for rglob in braceexpand.braceexpand(rglob):  # Expand braces
+
+                    if os.path.isabs(rglob):
+                        raise RuntimeError("Package.drain_package() received an absolute path as parameter, but it expects a relative one")
+
+                    for rpath in glob.glob(rglob):  # Expand globbing
+                        dstpath = os.path.join(
+                            self.wrap_cache,
+                            os.path.relpath(
+                                rpath,
+                                source.wrap_cache,
+                            ),
+                        )
+
+                        os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
+                        shutil.move(rpath, dstpath)
+
+    def drain_build_cache(self, src, dst):
+        """Drain the current :py:class:`.Build`, moving files from its ``build_cache`` to this package's ``wrap_cache``.
+
+        This function is mostly used to grab files that are given with the software's source code but aren't
+        automatically installed, like the documentation or some code examples.
+
+        *Example*: ::
+
+            package.drain_build_cache(
+                'doc/*',
+                'usr/share/doc/my_package_0.1.1/'
+            )
+
+        :note: Files are moved and not copied
+
+        :param src: A path pointing to the files to move, relative to the ``build_cache`` of the current :py:class:`.Build`,
+            This argument supports the globbing and braces syntax of common shells.
+        :param dst: A path pointing to the directory where the files should be moved, relative to the ``wrap_cache`` of this :py:class:`.Package`,
+
+        """
+        build = stdlib.build.current_build()
+
+        if os.path.isabs(src) or os.path.isabs(dst):
+            raise RuntimeError("Package.drain_build_cache() received an absolute path as parameter, but it expects a relative one")
+
+        # Move to source directory
+        with stdlib.pushd(build.build_cache):
+
+            for rglob in braceexpand.braceexpand(src):  # Expand braces
+                for rpath in glob.glob(rglob):  # Expand globbing
+                    dstpath = os.path.join(
+                        self.wrap_cache,
+                        dst,
+                    )
+
+                    os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
+                    shutil.move(rpath, dstpath)
+
+    def move(self, srcs: str, dst: str):
+        """Move the files pointed to by ``srcs`` to ``dst``.
+
+        :param srcs: The paths pointing to the files to move, relative to the ``wrap_cache`` of this :py:class:`.Package`.
+            This argument supports the globbing and braces syntax of common shells.
+        :param dst: A path pointing to the destination folder, relative to the ``wrap_cache`` of this :py:class:`.Package`.
+        """
+
+        if os.path.isabs(srcs) or os.path.isabs(dst):
+            raise RuntimeError("Package.move() received an absolute path as parameter, but it expects a relative one")
+
+        if not os.path.isdir(dst):
+            raise RuntimeError("Package.move() did not receive a path pointing to a directory as paramter")
+
+        with stdlib.pushd(self.wrap_cache):
+            for srcs in braceexpand.braceexpand(srcs):  # Expand braces
+                for src in glob.glob(srcs):  # Expand globbing
+                    os.makedirs(os.path.dirname(dst), exist_ok=True)  # Create parent directories (if any)
+                    shutil.move(src, dst)
+
+    def remove(self, *files: str):
+        """Remove the files pointed to by ``files``.
+
+        :param files: The paths pointing to the files to remove, relative to the ``wrap_cache`` of this :py:class:`.Package`.
+            This argument supports the globbing and braces syntax of common shells.
+        """
+
+        with stdlib.pushd(self.wrap_cache):
+            for file in files:
+
+                if os.path.isabs(file):
+                    raise RuntimeError("Package.remove() received an absolute path as parameter, but it expects a relative one")
+
+                for srcs in braceexpand.braceexpand(file):  # Expand braces
+                    for src in glob.glob(srcs):  # Expand globbing
+                        if os.path.isdir(src):
+                            shutil.rmtree(src)
+                        else:
+                            os.remove(src)
+
     def wrap(self):
         """Wrap the package by creating all the files needed by the repository (``nest-server``) to publish the package and putting
         them in the path referred to by ``self.package_cache``
@@ -149,7 +320,7 @@ class Package():
             with stdlib.log.pushlog():
                 for root, _, filenames in os.walk('.'):
                     for filename in filenames:
-                        stdlib.log.ilog(__colored_path(os.path.join(root, filename)))
+                        stdlib.log.ilog(_colored_path(os.path.join(root, filename)))
                         files_count += 1
             stdlib.log.ilog(f"(That's {files_count} files.)")
 
@@ -177,7 +348,7 @@ class Package():
         return str(self.id)
 
 
-def __colored_path(path, pretty_path=None):
+def _colored_path(path, pretty_path=None):
     if pretty_path is None:
         pretty_path = path
 
@@ -187,7 +358,7 @@ def __colored_path(path, pretty_path=None):
             os.readlink(path),
         )
         if os.path.exists(target_path):
-            return f"{colored(path, 'cyan', attrs=['bold'])} -> {__colored_path(target_path, os.readlink(path))}"
+            return f"{colored(path, 'cyan', attrs=['bold'])} -> {_colored_path(target_path, os.readlink(path))}"
         else:
             return f"{colored(path, on_color='on_red', attrs=['bold'])} -> {colored(os.readlink(path), on_color='on_red', attrs=['bold'])}"
     elif os.path.isdir(path):

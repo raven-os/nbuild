@@ -140,7 +140,7 @@ class Package():
         os.makedirs(self.package_cache)
 
     def is_empty(self) -> bool:
-        """Tests if the ``wrap_cache`` of this :py:class:`.Package` contains at least a single file.
+        """Test whether the ``wrap_cache`` of this :py:class:`.Package` contains at least a single file.
 
         :note: If the wrap cache contains only empty directories, this function returns ``False``.
 
@@ -152,7 +152,7 @@ class Package():
         return True
 
     def drain(self, *paths: str):
-        """Drain the current :py:class:`.Build`, moving files from its ``install_cache`` to this
+        """Drain the current :py:class:`.Build`, moving files from their ``install_cache`` to this
         :py:class:`.Package`'s ``wrap_cache``.
 
         This function is mostly used to grab the files that weren't automatically picked up by the package splitter.
@@ -206,7 +206,7 @@ class Package():
 
         :note: Files are moved and not copied
 
-        :param source: The source package containg the files to drain from.
+        :param source: The source package containing the files to drain from.
         :type source: :py:class:`.Package`
         :param paths: The paths pointing to the files to move, relative to the ``wrap_cache`` of the given :py:class:`.Package`.
             This argument supports the globbing and braces syntax of common shells.
@@ -252,9 +252,7 @@ class Package():
         """
         build = stdlib.build.current_build()
 
-        if os.path.isabs(src):
-            raise RuntimeError("Package.drain_build_cache() received an absolute path as parameter, but it expects a relative one")
-        if os.path.isabs(dst):
+        if os.path.isabs(src) or os.path.isabs(dst):
             raise RuntimeError("Package.drain_build_cache() received an absolute path as parameter, but it expects a relative one")
 
         # Move to source directory
@@ -277,11 +275,12 @@ class Package():
             This argument supports the globbing and braces syntax of common shells.
         :param dst: A path pointing to the destination folder, relative to the ``wrap_cache`` of this :py:class:`.Package`.
         """
-        if os.path.isabs(srcs):
+
+        if os.path.isabs(srcs) or os.path.isabs(dst):
             raise RuntimeError("Package.move() received an absolute path as parameter, but it expects a relative one")
 
-        if os.path.isabs(dst):
-            raise RuntimeError("Package.move() received an absolute path as parameter, but it expects a relative one")
+        if not os.path.isdir(dst):
+            raise RuntimeError("Package.move() did not receive a path pointing to a directory as paramter")
 
         with stdlib.pushd(self.wrap_cache):
             for srcs in braceexpand.braceexpand(srcs):  # Expand braces

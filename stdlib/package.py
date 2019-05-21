@@ -78,7 +78,7 @@ class Package():
         If ``None`` is given, the url is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
     :param kind: The kind of the package. Effective means the package has data to install, while Virtual means the package has no data to install.
-        If ``None`` is given, the url is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
+        If ``None`` is given, the kind is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
     :param run_dependencies: A dictionary of runtime dependencies. The key is a package's full name, and the value is a version requirement.
         The default value is ``dict()``.

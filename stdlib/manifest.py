@@ -50,6 +50,8 @@ class BuildManifestMetadata():
     :param licenses: The licenses of the built software.
     :type licenses: ``List`` [ :py:class:`.License` ]
     :param upstream_url: The URL pointing to the home page of the software.
+    :param kind: The kind of the package. Effective means the package has data to install, while Virtual means the package has no data to install.
+    :type kind: :py:class:`.Kind`
 
     :ivar name: The name of the software being built.
     :vartype name: ``str``
@@ -71,6 +73,9 @@ class BuildManifestMetadata():
 
     :ivar upstream_url: The URL pointing to the home page of the software.
     :vartype upstream_url: ``str``
+
+    :ivar kind: The kind of the package
+    :vartype kind: :py:class:`~stdlib.kind.Kind`
     """
     def __init__(
         self,
@@ -81,6 +86,7 @@ class BuildManifestMetadata():
         maintainer: str,
         licenses,
         upstream_url: str,
+        kind,
     ):
         self.name = name
         self.category = category
@@ -89,6 +95,7 @@ class BuildManifestMetadata():
         self.maintainer = maintainer
         self.licenses = licenses
         self.upstream_url = upstream_url
+        self.kind = kind
 
 
 class BuildManifest():

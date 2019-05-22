@@ -9,6 +9,7 @@ import tarfile
 import toml
 import datetime
 import stdlib.log
+import stdlib.kind
 import braceexpand
 import glob
 from typing import List, Dict
@@ -76,6 +77,9 @@ class Package():
     :param upstream_url: An URL pointing to the home page of the software.
         If ``None`` is given, the url is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
+    :param kind: The kind of the package. Effective means the package has data to install, while Virtual means the package has no data to install.
+        If ``None`` is given, the kind is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
+        The default value is ``None``.
     :param run_dependencies: A dictionary of runtime dependencies. The key is a package's full name, and the value is a version requirement.
         The default value is ``dict()``.
 
@@ -97,6 +101,9 @@ class Package():
     :ivar upstream_url: An URL pointing to the home page of the software.
     :vartype upstream_url: ``str``
 
+    :ivar kind: The kind of the package. Effective means the package has data to install, while Virtual means the package has no data to install.
+    :vartype kind: :py:class:`~stdlib.kind.Kind`
+
     :ivar run_dependencies: A dictionary of runtime dependencies. The key is a package's full name, and the value is a version requirement.
     :vartype run_dependencies: ``Dict`` [ ``str``, ``str`` ]
 
@@ -114,6 +121,7 @@ class Package():
         maintainer: str = None,
         licenses: List[stdlib.License] = None,
         upstream_url: str = None,
+        kind: stdlib.kind.Kind = None,
         run_dependencies: Dict[str, str]={},
     ):
         from core.cache import get_wrap_cache, get_package_cache
@@ -123,9 +131,11 @@ class Package():
         self.id = id
         self.description = description if description is not None else build.manifest.metadata.description
         self.description = self.description.replace('\n', ' ').strip()
+        self.tags = tags if tags is not None else build.manifest.metadata.tags
         self.maintainer = maintainer if maintainer is not None else build.manifest.metadata.maintainer
         self.licenses = licenses if licenses is not None else build.manifest.metadata.licenses
         self.upstream_url = upstream_url if upstream_url is not None else build.manifest.metadata.upstream_url
+        self.kind = kind if kind is not None else build.manifest.metadata.kind
         self.run_dependencies = copy.deepcopy(run_dependencies)
 
         self.wrap_cache = get_wrap_cache(self)
@@ -314,35 +324,56 @@ class Package():
         """
         stdlib.log.slog(f"Wrapping {self.id} ({self.wrap_cache})")
 
-        with stdlib.pushd(self.wrap_cache):
-            files_count = 0
-            stdlib.log.ilog("Files added:")
-            with stdlib.log.pushlog():
-                for root, _, filenames in os.walk('.'):
-                    for filename in filenames:
-                        stdlib.log.ilog(_colored_path(os.path.join(root, filename)))
-                        files_count += 1
-            stdlib.log.ilog(f"(That's {files_count} files.)")
+        if self.kind == stdlib.kind.Kind.EFFECTIVE:
+            with stdlib.pushd(self.wrap_cache):
+                files_count = 0
+                stdlib.log.ilog("Files added:")
+                with stdlib.log.pushlog():
+                    for root, _, filenames in os.walk('.'):
+                        for filename in filenames:
+                            stdlib.log.ilog(_colored_path(os.path.join(root, filename)))
+                            files_count += 1
+                stdlib.log.ilog(f"(That's {files_count} files.)")
 
-            stdlib.log.slog("Creating data.tar.gz")
-            tarball_path = os.path.join(self.package_cache, 'data.tar.gz')
-            with tarfile.open(tarball_path, mode='w:gz') as archive:
-                archive.add('./')
+                stdlib.log.slog("Creating data.tar.gz")
+                tarball_path = os.path.join(self.package_cache, 'data.tar.gz')
+                with tarfile.open(tarball_path, mode='w:gz') as archive:
+                    archive.add('./')
+        elif self.kind == stdlib.kind.Kind.VIRTUAL:
+            stdlib.log.ilog("Package is virtual, no data is wrapped.")
 
         stdlib.log.slog("Creating manifest.toml")
         toml_path = os.path.join(self.package_cache, 'manifest.toml')
         with open(toml_path, "w") as filename:
             manifest = {
+                'name': self.id.name,
+                'category': self.id.category,
+                'version': self.id.version,
                 'metadata': {
-                    'name': self.id.name,
-                    'category': self.id.category,
-                    'version': self.id.version,
                     'description': self.description,
-                    'created_at': datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
+                    'tags': self.tags,
+                    'maintainer': self.maintainer,
+                    'licenses': list(map(lambda l: l.value, self.licenses)),
+                    'upstream_url': self.upstream_url,
                 },
+                'kind': self.kind.value,
+                'wrap_date': datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
                 'dependencies': self.run_dependencies,
             }
             toml.dump(manifest, filename)
+
+        stdlib.log.slog("Creating package.nest")
+        with stdlib.pushd(self.package_cache):
+            nest_file = os.path.join(self.package_cache, f'{self.id.name}-{self.id.version}.nest')
+            with tarfile.open(nest_file, mode='w') as archive:
+                archive.add('./manifest.toml')
+                if self.kind == stdlib.kind.Kind.EFFECTIVE:
+                    archive.add('./data.tar.gz')
+
+            # Remove temporary manifest.toml and data.tar.gz
+            os.remove('./manifest.toml')
+            if self.kind == stdlib.kind.Kind.EFFECTIVE:
+                os.remove('./data.tar.gz')
 
     def __str__(self):
         return str(self.id)

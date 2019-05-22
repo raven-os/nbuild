@@ -11,16 +11,16 @@ class License(Enum):
     :info: This enumeration is of course incomplete, and will be completed when necessary.
     """
 
-    GPL_V1 = 'GPL v1'
-    GPL_V2 = 'GPL v2'
-    GPL_V3 = 'GPL v3'
-    AGPL_V3 = 'AGPL v3'
-    LGPL_V3 = 'LGPL v3'
-    BSD = 'BSD'
-    MOZILLA = 'MPL'
-    MIT = 'MIT'
-    APACHE = 'Apache'
-    PUBLIC_DOMAIN = 'Public Domain'
+    GPL_V1 = 'gpl_v1'
+    GPL_V2 = 'gpl_v2'
+    GPL_V3 = 'gpl_v3'
+    AGPL_V3 = 'agpl_v3'
+    LGPL_V3 = 'lgpl_v3'
+    BSD = 'bsd'
+    MOZILLA = 'mozilla'
+    MIT = 'mit'
+    APACHE = 'apache'
+    PUBLIC_DOMAIN = 'public_domain'
 
-    CUSTOM = 'Custom'
-    NONE = 'None'
+    CUSTOM = 'custom'
+    NONE = 'none'

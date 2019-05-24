@@ -112,6 +112,8 @@ def build(
 
     output = dict()
 
+    output = dict()
+
     os.makedirs(build_folder, exist_ok=True)
     with stdlib.pushd(build_folder):
 

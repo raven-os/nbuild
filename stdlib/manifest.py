@@ -237,10 +237,15 @@ def manifest(
                     pkgs = build.build()
 
                 # Wrap packages
+<<<<<<< HEAD
                 for pkg in pkgs:
                     with stdlib.log.pushlog():
                         pkg.wrap()
 
             stdlib.log.slog(f"Done!")
+=======
+                for pkg in pkgs.values():
+                    pkg.wrap()
+>>>>>>> Change the return value of a splitter and the first one: `split_all`
 
     return exec_manifest

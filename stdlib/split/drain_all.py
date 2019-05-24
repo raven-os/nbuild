@@ -7,10 +7,16 @@ A very basic and primitive splitter that drains all the output files of a build 
 
 import stdlib.build
 import stdlib.package
+<<<<<<< HEAD
 from typing import Dict
 
 
 def drain_all() -> Dict[str, stdlib.package.Package]:
+=======
+
+
+def drain_all():
+>>>>>>> Change the return value of a splitter and the first one: `split_all`
     """
     A very basic and primitive splitter that drains all the output files of a build into a single package, named after the
     :py:class:`.BuildManifest`.
@@ -18,6 +24,10 @@ def drain_all() -> Dict[str, stdlib.package.Package]:
 
     :returns: A dictionary, with the generated package's :py:func:`~stdlib.package.PackageID.short_name` as the key, and the
         associated :py:class:`.Package` as the value.
+<<<<<<< HEAD
+=======
+    :returntype: ``Dict`` [ ``str`` , :py:class:`.Package` ]
+>>>>>>> Change the return value of a splitter and the first one: `split_all`
     """
 
     build = stdlib.build.current_build()

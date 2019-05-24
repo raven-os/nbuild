@@ -108,6 +108,8 @@ def build(
         with stdlib.log.pushlog():
             patch()
 
+    output = dict()
+
     os.makedirs(build_folder, exist_ok=True)
     with stdlib.pushd(build_folder):
 
@@ -136,11 +138,11 @@ def build(
         stdlib.log.ilog("Step 8/9: Split")
         if split is not None:
             with stdlib.log.pushlog():
-                split()
+                output = split()
 
         stdlib.log.ilog("Step 9/9: Dependency Linking")
         if deplinker is not None:
             with stdlib.log.pushlog():
                 deplinker()
 
-    return []
+    return output

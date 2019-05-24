@@ -1,4 +1,4 @@
-# Nest Build 
+# Nest Build
 
 *An automated package builder for lazy maintainers.*
 

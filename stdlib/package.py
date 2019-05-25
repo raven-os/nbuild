@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/asr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """Types and functions to manipulate packages and their content."""
 
@@ -16,52 +16,16 @@ from typing import List, Dict
 from termcolor import colored
 
 
-class PackageID():
-    """The unique identifier of a package: its repository, category, name and version.
+class Package():
+    """A package, the output of a :py:class:`~stdlib.build.Build`.
 
     :param name: The name of the package. The name should be in ``snake-case``.
-    :param repository: The name of the repository. The name should be in ``snake-case``.
-        If ``None`` is given, the repository name is taken from the arguments given to Nest Build.
-        The default value is ``None``.
     :param category: The name of the category. The name should be in ``snake-case``.
         If ``None`` is given, the category name is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
     :param version: The version number. The version should follow `Semantic Versioning 2.0.0`_.
         If ``None`` is given, the version number is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
-
-    .. _Semantic Versioning 2.0.0: https://semver.org/spec/v2.0.0.html
-    """
-    def __init__(
-        self,
-        name: str,
-        repository: str = None,
-        category: str = None,
-        version: str = None,
-    ):
-        build = stdlib.build.current_build()
-
-        import core.args
-        self.repository = repository if repository is not None else core.args.get_args().repository
-        self.category = category if category is not None else build.manifest.metadata.category
-        self.version = version if version is not None else build.semver
-        self.name = name
-
-    def full_name(self) -> str:
-        """Return a string representing the full name of the package, which is the combination of its repository, category and name.
-
-        :return: A string representing the full name of the package
-        """
-        return f'{self.repository}::{self.category}/{self.name}'
-
-    def __str__(self) -> str:
-        return f'{self.full_name()}#{self.version}'
-
-
-class Package():
-    """A package, the output of a :py:class:`~stdlib.build.Build`.
-
-    :param id: The unique identifier of the package, including its name, category, repository and version.
     :param description: A description of the package. This description should start with an uppercase letter and finish with a dot.
         If ``None`` is given, the description is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
@@ -83,8 +47,14 @@ class Package():
     :param run_dependencies: A dictionary of runtime dependencies. The key is a package's full name, and the value is a version requirement.
         The default value is ``dict()``.
 
-    :ivar id: The unique identifier of the package, including its name, category, repository and version.
-    :vartype id: ``str``
+    :ivar name: The name of the package.
+    :vartype name: ``str``
+
+    :ivar category: The name of the category.
+    :vartype category: ``str``
+
+    :ivar version: The version number following `Semantic Versioning 2.0.0`_.
+    :vartype version: ``str``
 
     :ivar description: A description of the package.
     :vartype description: ``str``
@@ -102,7 +72,7 @@ class Package():
     :vartype upstream_url: ``str``
 
     :ivar kind: The kind of the package. Effective means the package has data to install, while Virtual means the package has no data to install.
-    :vartype kind: :py:class:`~stdlib.kind.Kind`
+    :vartype kind: :py:class:`.Kind`
 
     :ivar run_dependencies: A dictionary of runtime dependencies. The key is a package's full name, and the value is a version requirement.
     :vartype run_dependencies: ``Dict`` [ ``str``, ``str`` ]
@@ -115,7 +85,9 @@ class Package():
     """
     def __init__(
         self,
-        id: PackageID,
+        name: str,
+        category: str = None,
+        version: str = None,
         description: str = None,
         tags: List[str] = None,
         maintainer: str = None,
@@ -128,7 +100,9 @@ class Package():
 
         build = stdlib.build.current_build()
 
-        self.id = id
+        self.name = name
+        self.category = category if category is not None else build.manifest.metadata.category
+        self.version = version if version is not None else build.semver
         self.description = description if description is not None else build.manifest.metadata.description
         self.description = self.description.replace('\n', ' ').strip()
         self.tags = tags if tags is not None else build.manifest.metadata.tags
@@ -145,9 +119,8 @@ class Package():
             shutil.rmtree(self.wrap_cache)
         os.makedirs(self.wrap_cache)
 
-        if os.path.exists(self.package_cache):
-            shutil.rmtree(self.package_cache)
-        os.makedirs(self.package_cache)
+        if not os.path.exists(self.package_cache):
+            os.makedirs(self.package_cache)
 
     def is_empty(self) -> bool:
         """Test whether the ``wrap_cache`` of this :py:class:`.Package` contains at least a single file.
@@ -319,64 +292,68 @@ class Package():
                             os.remove(src)
 
     def wrap(self):
-        """Wrap the package by creating all the files needed by the repository (``nest-server``) to publish the package and putting
-        them in the path referred to by ``self.package_cache``
+        """Wrap the package into a single file, called a ``NPF`` (Nest Package File), ending with the ``.nest`` extention and compatible with
+        ``nest-server`` so it can be published. The NPF is put in the folder referred to by ``self.package_cache``.
         """
-        stdlib.log.slog(f"Wrapping {self.id} ({self.wrap_cache})")
+        stdlib.log.slog(f"Wrapping {self} ({self.wrap_cache})")
 
-        if self.kind == stdlib.kind.Kind.EFFECTIVE:
-            with stdlib.pushd(self.wrap_cache):
-                files_count = 0
-                stdlib.log.ilog("Files added:")
-                with stdlib.log.pushlog():
-                    for root, _, filenames in os.walk('.'):
-                        for filename in filenames:
-                            stdlib.log.ilog(_colored_path(os.path.join(root, filename)))
-                            files_count += 1
-                stdlib.log.ilog(f"(That's {files_count} files.)")
+        npf_path = os.path.join(self.package_cache, f'{self.name}-{self.version}.nest')
 
-                stdlib.log.slog("Creating data.tar.gz")
-                tarball_path = os.path.join(self.package_cache, 'data.tar.gz')
-                with tarfile.open(tarball_path, mode='w:gz') as archive:
-                    archive.add('./')
-        elif self.kind == stdlib.kind.Kind.VIRTUAL:
-            stdlib.log.ilog("Package is virtual, no data is wrapped.")
-
-        stdlib.log.slog("Creating manifest.toml")
-        toml_path = os.path.join(self.package_cache, 'manifest.toml')
-        with open(toml_path, "w") as filename:
-            manifest = {
-                'name': self.id.name,
-                'category': self.id.category,
-                'version': self.id.version,
-                'metadata': {
-                    'description': self.description,
-                    'tags': self.tags,
-                    'maintainer': self.maintainer,
-                    'licenses': list(map(lambda l: l.value, self.licenses)),
-                    'upstream_url': self.upstream_url,
-                },
-                'kind': self.kind.value,
-                'wrap_date': datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
-                'dependencies': self.run_dependencies,
-            }
-            toml.dump(manifest, filename)
-
-        stdlib.log.slog("Creating package.nest")
-        with stdlib.pushd(self.package_cache):
-            nest_file = os.path.join(self.package_cache, f'{self.id.name}-{self.id.version}.nest')
-            with tarfile.open(nest_file, mode='w') as archive:
-                archive.add('./manifest.toml')
-                if self.kind == stdlib.kind.Kind.EFFECTIVE:
-                    archive.add('./data.tar.gz')
-
-            # Remove temporary manifest.toml and data.tar.gz
-            os.remove('./manifest.toml')
+        with stdlib.log.pushlog():
             if self.kind == stdlib.kind.Kind.EFFECTIVE:
-                os.remove('./data.tar.gz')
+                with stdlib.pushd(self.wrap_cache):
+                    files_count = 0
+                    stdlib.log.ilog("Files added:")
+                    with stdlib.log.pushlog():
+                        for root, _, filenames in os.walk('.'):
+                            for filename in filenames:
+                                stdlib.log.ilog(_colored_path(os.path.join(root, filename)))
+                                files_count += 1
+                    stdlib.log.ilog(f"(That's {files_count} files.)")
+
+                    stdlib.log.slog("Creating data.tar.gz")
+                    tarball_path = os.path.join(self.package_cache, 'data.tar.gz')
+                    with tarfile.open(tarball_path, mode='w:gz') as archive:
+                        archive.add('./')
+            elif self.kind == stdlib.kind.Kind.VIRTUAL:
+                stdlib.log.ilog("Package is virtual, no data is wrapped.")
+
+            stdlib.log.slog("Creating manifest.toml")
+            toml_path = os.path.join(self.package_cache, 'manifest.toml')
+            with open(toml_path, "w") as filename:
+                manifest = {
+                    'name': self.name,
+                    'category': self.category,
+                    'version': self.version,
+                    'metadata': {
+                        'description': self.description,
+                        'tags': self.tags,
+                        'maintainer': self.maintainer,
+                        'licenses': list(map(lambda l: l.value, self.licenses)),
+                        'upstream_url': self.upstream_url,
+                    },
+                    'kind': self.kind.value,
+                    'wrap_date': datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
+                    'dependencies': self.run_dependencies,
+                }
+                toml.dump(manifest, filename)
+
+            stdlib.log.slog(f"Creating {self.name}-{self.version}.nest")
+            with stdlib.pushd(self.package_cache):
+                with tarfile.open(npf_path, mode='w') as archive:
+                    archive.add('./manifest.toml')
+                    if self.kind == stdlib.kind.Kind.EFFECTIVE:
+                        archive.add('./data.tar.gz')
+
+                # Remove temporary manifest.toml and data.tar.gz
+                os.remove('./manifest.toml')
+                if self.kind == stdlib.kind.Kind.EFFECTIVE:
+                    os.remove('./data.tar.gz')
+
+        stdlib.log.slog(f"Done! Package located at \"{npf_path}\".")
 
     def __str__(self):
-        return str(self.id)
+        return f'{self.category}/{self.name}#{self.version}'
 
 
 def _colored_path(path, pretty_path=None):

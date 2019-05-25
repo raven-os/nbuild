@@ -95,15 +95,18 @@ def build(
 
     stdlib.log.ilog("Step 1/9: Fetch")
     if fetch is not None:
-        fetch()
+        with stdlib.log.pushlog():
+            fetch()
 
     stdlib.log.ilog("Step 2/9: Extract")
     if extract is not None:
-        extract()
+        with stdlib.log.pushlog():
+            extract()
 
     stdlib.log.ilog("Step 3/9: Patch")
     if patch is not None:
-        patch()
+        with stdlib.log.pushlog():
+            patch()
 
     os.makedirs(build_folder, exist_ok=True)
     with stdlib.pushd(build_folder):
@@ -112,26 +115,32 @@ def build(
 
         stdlib.log.ilog("Step 4/9: Configure")
         if configure is not None:
-            configure()
+            with stdlib.log.pushlog():
+                configure()
 
         stdlib.log.ilog("Step 5/9: Compile")
         if compile is not None:
-            compile()
+            with stdlib.log.pushlog():
+                compile()
 
         stdlib.log.ilog("Step 6/9: Check")
         if check is not None:
-            check()
+            with stdlib.log.pushlog():
+                check()
 
         stdlib.log.ilog("Step 7/9: Install")
         if install is not None:
-            install()
+            with stdlib.log.pushlog():
+                install()
 
         stdlib.log.ilog("Step 8/9: Split")
         if split is not None:
-            split()
+            with stdlib.log.pushlog():
+                split()
 
-        stdlib.log.ilog("Step 9/9: Dependency Linking")
+        stdlib.log.ilog("Step 9/9: Dependency Link")
         if deplinker is not None:
-            deplinker()
+            with stdlib.log.pushlog():
+                deplinker()
 
     return []

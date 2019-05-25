@@ -47,13 +47,6 @@ def parse_args():
         help="Remove all cached data.",
     )
     nbuild_parser.add_argument(
-        '-r',
-        '--repository',
-        default='stable',
-        metavar='REPOSITORY',
-        help="Name of the repository the built packages will be a part of. Default: stable",
-    )
-    nbuild_parser.add_argument(
         'manifest',
         metavar='MANIFEST_PATH',
         nargs='?',

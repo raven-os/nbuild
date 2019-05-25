@@ -231,8 +231,9 @@ def manifest(
             stdlib.log.slog(f"Building {build}")
 
             # Save state before building
-            with stdlib.pushd(), stdlib.pushenv(), stdlib.log.pushlog():
-                pkgs = build.build()
+            with stdlib.pushd(), stdlib.pushenv():
+                with stdlib.log.pushlog():
+                    pkgs = build.build()
 
                 # Wrap packages
                 for pkg in pkgs:

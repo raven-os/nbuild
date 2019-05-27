@@ -6,7 +6,7 @@
 
 import os
 import shutil
-from typing import Dict, Iterable
+from typing import Dict
 
 _current_build = None
 
@@ -42,9 +42,10 @@ class Build():
     def build(self):
         """Set the current build to ``self`` and execute the instructions contained in the :py:class:`.BuildManifest`.
 
-        :returns: An iterable collection of :py:class:`.Package` s, like a ``List``.
+        :returns: A dictionary, with a package's :py:func:`~stdlib.package.PackageID.short_name` as the key, and the
+            associated :py:class:`.Package` as the value.
             It forwards the return value of the instructions contained in the :py:class:`.BuildManifest`.
-        :returntype: ``Iterable`` [ :py:class:`.Package` ]
+        :returntype: ``Dict`` [ ``str`` , :py:class:`.Package` ]
         """
         _set_current_build(self)
 

@@ -9,6 +9,7 @@ import stdlib
 import stdlib.fetch
 import stdlib.extract
 import stdlib.patch
+import stdlib.split.drain_all
 
 from stdlib.template.configure import configure
 from stdlib.template.make import make
@@ -23,7 +24,7 @@ def build(
     compile=make,
     check=lambda: make('check', fail_ok=True),
     install=lambda: make('install', f'DESTDIR={stdlib.build.current_build().install_cache}'),
-    split=None,
+    split=stdlib.split.drain_all.drain_all,
     deplinker=None,
 ):
     """Download, build and wrap a library based on ``autoconf`` and ``make``.
@@ -85,7 +86,8 @@ def build(
 
     **Split**
 
-        This step is still a work in progress. The default value is ``None``.
+        This step automatically splits the output of the build into multiple packages. The default value is :py:func:`~stdlib.split.drain_all.drain_all`.
+        Alternative splitters can be found in the :py:mod:`~stdlib.split` module.
 
     **Dependency Linking**
 
@@ -107,6 +109,8 @@ def build(
     if patch is not None:
         with stdlib.log.pushlog():
             patch()
+
+    output = dict()
 
     os.makedirs(build_folder, exist_ok=True)
     with stdlib.pushd(build_folder):
@@ -136,11 +140,11 @@ def build(
         stdlib.log.ilog("Step 8/9: Split")
         if split is not None:
             with stdlib.log.pushlog():
-                split()
+                output = split()
 
         stdlib.log.ilog("Step 9/9: Dependency Linking")
         if deplinker is not None:
             with stdlib.log.pushlog():
                 deplinker()
 
-    return []
+    return output

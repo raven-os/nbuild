@@ -151,8 +151,9 @@ class BuildManifest():
     :param versionized_args: A list of dictionaries used as a generic way to give arguments to each versions of the build.
         See the above explanations for its exact structure and limitations.
     :param instructions: A callable (usually a python function) that builds the packages. It takes a :py:class:`~stdlib.build.Build` as parameter
-        and returns an iterable collection of :py:class:`~stdlib.package.Package` (usually a list).
-    :type instructions: fn (:py:class:`~stdlib.build.Build`) -> ``Iterable`` [ :py:class:`~stdlib.package.Package` ]
+        and returns a dictionary, with a package's :py:func:`~stdlib.package.PackageID.short_name` as the key, and the
+        associated :py:class:`.Package` as the value.
+    :type instructions: fn (:py:class:`~stdlib.build.Build`) -> ``Dict`` [ ``str``, :py:class:`~stdlib.package.Package` ]
 
     :ivar path: The path where the build manifest is stored
     :vartype path: ``str``
@@ -164,7 +165,7 @@ class BuildManifest():
     :vartype versionized_args: ``List`` [ ``Dict`` [ ``str``, ``str`` ] ]
 
     :ivar instructions: A callable that builds the package.
-    :vartype instructions: fn (:py:class:`~stdlib.build.Build`) -> ``Iterable`` [ :py:class:`~stdlib.package.Package` ]
+    :vartype instructions: fn (:py:class:`~stdlib.build.Build`) -> ``Dict`` [ ``str``, :py:class:`~stdlib.package.Package` ]
     """
     def __init__(
         self,

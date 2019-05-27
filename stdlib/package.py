@@ -47,6 +47,13 @@ class PackageID():
         self.version = version if version is not None else build.semver
         self.name = name
 
+    def short_name(self) -> str:
+        """Return a string representing the short name of the package, which is the combination of its category and name.
+
+        :return: A string representing the short name of the package
+        """
+        return f'{self.category}/{self.name}'
+
     def full_name(self) -> str:
         """Return a string representing the full name of the package, which is the combination of its repository, category and name.
 

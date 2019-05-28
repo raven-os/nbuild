@@ -123,3 +123,4 @@ dmypy.json
 /docs/source/nbuild*.rst
 /docs/source/stdlib*.rst
 /docs/source/modules.rst
+/config.toml

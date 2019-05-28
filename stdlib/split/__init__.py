@@ -7,7 +7,7 @@ They approach the problem differently, letting the maintainer choose the one tha
 he is building.
 
 They all share the same properties which are required to ensure they can be used interchangeably:
-  * They don't take any parameter
+  * They don't take any mandatory parameter
   * They return a dictionary, with the generated packages' :py:func:`~stdlib.package.PackageID.short_name` as the key, and the
     associated :py:class:`.Package` as the value.
   * The :py:func:`~stdlib.package.PackageID.short_name` used as a key is guaranteed to match the one of the package matching that key.

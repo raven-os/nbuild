@@ -22,6 +22,15 @@ def parse_args():
         description="Compiles packages from a build Manifest."
     )
     nbuild_parser.add_argument(
+        '--config',
+        default=os.path.join(  # Default path is script_dir/config.toml
+            os.getcwd(),
+            os.path.dirname(sys.argv[0]),
+            'config.toml',
+        ),
+        help="Static configuration for Nest Build. Default: config.toml",
+    )
+    nbuild_parser.add_argument(
         '-o',
         '--output-dir',
         default=os.path.join(  # Default path is script_dir/packages
@@ -45,13 +54,6 @@ def parse_args():
         '--purge',
         action='store_true',
         help="Remove all cached data.",
-    )
-    nbuild_parser.add_argument(
-        '-r',
-        '--repository',
-        default='stable',
-        metavar='REPOSITORY',
-        help="Name of the repository the built packages will be a part of. Default: stable",
     )
     nbuild_parser.add_argument(
         'manifest',

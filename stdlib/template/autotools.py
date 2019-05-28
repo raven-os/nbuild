@@ -4,12 +4,12 @@
 """
 
 import os
-import nbuild
 import stdlib
 import stdlib.fetch
 import stdlib.extract
 import stdlib.patch
 import stdlib.split.drain_all
+import stdlib.deplinker.elf
 
 from stdlib.template.configure import configure
 from stdlib.template.make import make
@@ -25,7 +25,7 @@ def build(
     check=lambda: make('check', fail_ok=True),
     install=lambda: make('install', f'DESTDIR={stdlib.build.current_build().install_cache}'),
     split=stdlib.split.drain_all.drain_all,
-    deplinker=None,
+    deplinker=stdlib.deplinker.elf.elf_deplinker,
 ):
     """Download, build and wrap a library based on ``autoconf`` and ``make``.
 
@@ -91,7 +91,9 @@ def build(
 
     **Dependency Linking**
 
-        This step is still a work in progress. The default value is ``None``.
+        This step automatically finds requirements for the generated packages. The default value is :py:func:`~stdlib.deplinker.elf.elf_deplinker`.
+        Alternative dependency linkers can be found in the :py:mod:`~stdlib.deplinker` module.
+
     """
     build = stdlib.build.current_build()
 
@@ -110,9 +112,7 @@ def build(
         with stdlib.log.pushlog():
             patch()
 
-    output = dict()
-
-    output = dict()
+    packages = dict()
 
     os.makedirs(build_folder, exist_ok=True)
     with stdlib.pushd(build_folder):
@@ -142,11 +142,11 @@ def build(
         stdlib.log.ilog("Step 8/9: Split")
         if split is not None:
             with stdlib.log.pushlog():
-                output = split()
+                packages = split()
 
         stdlib.log.ilog("Step 9/9: Dependency Linking")
         if deplinker is not None:
             with stdlib.log.pushlog():
-                deplinker()
+                deplinker(packages)
 
-    return output
+    return packages

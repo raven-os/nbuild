@@ -18,7 +18,7 @@ def load_config():
 
 
 def get_config() -> Dict[str, object]:
-    """Return the parsed documentention as a dictionary.
+    """Return the parsed configuration as a dictionary.
 
     :note: There is no guarantee whatsoever regarding the content of this dictionary.
         Therefore, it is the responsability of the caller to ensure any field is actually present in

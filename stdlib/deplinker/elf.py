@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
-"""A primordial dependency linker that assign requirements based on ELF dependencies."""
+"""A primary dependency linker that assign requirements based on ELF dependencies."""
 
 import requests
 import ntpath
@@ -27,7 +27,7 @@ def elf_deplinker(
 
     This dependency linker will expand all ``search_patterns`` and try to analyse all files as ELF.
 
-    For all ELF, this dependency linker will retrieve all ELF dependencies. It will then see if any of those dependencies
+    For each ELF, this dependency linker will retrieve all the ELF dependencies. It will then see if any of those dependencies
     are either provided by another package of the same build; or try to fetch the list of repositories
     written in the :py:mod:`~core.config` file (in the order indicated) to find the unique package that contains
     any of those files; and add it as a requirement.
@@ -35,7 +35,7 @@ def elf_deplinker(
     :param packages: The packages which should have their dependencies assigned
     :paramtype packages: ``List`` [ :py:class:`.Package` ]
 
-    :param search_patterns: A list of pattern which should match any ELF file present in the package's content.
+    :param search_patterns: A list of patterns which should match any ELF file present in the package's content.
         Any element of this list supports the globbing and braces syntax of common shells.
 
         The default value is: ::
@@ -63,7 +63,7 @@ def elf_deplinker(
     :param remote_resolving: Indicate whether or not remote repositories should be used to solve dependencies. Default value is ``True``.
     """
     binaries = dict()  # Key = a binary filename, Value = a package ID
-    dependencies = dict()  # Key = a package ID, Value = a list of ELF filename
+    dependencies = dict()  # Key = a package ID, Value = a list of ELF filenames
 
     for package in packages.values():
         stdlib.log.ilog(f"ELF Dependency Linker: Looking for binaries and their dependencies in {package.id.full_name()}...")
@@ -167,7 +167,7 @@ def _solve_remotely(dependency) -> Optional[str]:
             else:
                 raise RuntimeError("Repository returned an unknown status code")
         except:
-            stdlib.log.elog(f"An unknown error occured when fetching \"{repository}\" (is the link dead?), skipping...")
+            stdlib.log.elog(f"An unknown error occurred when fetching \"{repository}\" (is the link dead?), skipping...")
 
     return None
 

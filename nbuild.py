@@ -85,7 +85,7 @@ def main():
     os.environ['MAKEFLAGS'] = f'-j{cpu_count() + 1}'
 
     # Override environment with the content of the config file
-    if core.config.get_config().get('env') is not None:
+    if 'env' in core.config.get_config():
         os.environ.update(core.config.get_config()['env'])
 
     manifest_path = core.args.get_args().manifest

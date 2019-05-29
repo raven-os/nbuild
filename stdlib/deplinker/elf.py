@@ -79,7 +79,7 @@ def elf_deplinker(
         # we're actively checking against it.
         for elf in map(ntpath.basename, elfs):
 
-            if binaries.get(elf) is not None:
+            if elf in binaries:
                 stdlib.log.flog(f"Two packages have the same file \"{elf}\": {binaries[elf]} and {pkg_id} -- Aborting")
                 exit(1)
 

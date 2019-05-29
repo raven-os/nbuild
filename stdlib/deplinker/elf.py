@@ -75,8 +75,14 @@ def elf_deplinker(
 
         # Fill the `binaries` dict, to keep track of who owns a binary in the local context
         #
-        # This generates unspecified behaviour if two packages have two binaries with the same filename
+        # This generates unspecified behaviour if two packages have two binaries with the same filename, so
+        # we're actively checking against it.
         for elf in map(ntpath.basename, elfs):
+
+            if binaries.get(elf) is not None:
+                stdlib.log.flog(f"Two packages have the same file \"{elf}\": {binaries[elf]} and {pkg_id} -- Aborting")
+                exit(1)
+
             binaries[elf] = pkg_id
 
         # Find the dependencies of every binaries
@@ -116,11 +122,11 @@ def elf_deplinker(
                     continue
                 elif remote_resolving:
                     with stdlib.log.pushlog():
-                        dependency_fn = _solve_remotely(dependency)
+                        solver_fullname = _solve_remotely(dependency)
 
-                    if dependency_fn is not None:
-                        requirements.update({dependency_fn: '*'})
-                        stdlib.log.slog(f"Found remotely: {dependency_fn}#*")
+                    if solver_fullname is not None:
+                        requirements.update({solver_fullname: '*'})
+                        stdlib.log.slog(f"Found remotely: {solver_fullname}#*")
                         continue
 
                 stdlib.log.elog(f"Requirement couldn't be solved -- Manual dependency linking required!")
@@ -148,7 +154,7 @@ def _solve_remotely(dependency) -> Optional[str]:
                 if len(results) == 1:
                     result = results[0]
                     if not result['all_versions']:
-                        stdlib.log.elog(f"\"{repository}\" contains a single package with file \"{dependency}\" but for all versions")
+                        stdlib.log.elog(f"\"{repository}\" contains a single package with file \"{dependency}\" but not for all versions")
                     else:
                         stdlib.log.slog(f"\"{repository}\" contains a single package with file \"{dependency}\"!")
                         return result['name']
@@ -195,7 +201,9 @@ def _find_elfs(package, search_patterns) -> [str]:
                     # We want to retain ELFs only
                     #
                     # Unfortunately, I couldn't find a better way but to try to open the file
-                    # and catch any exception
+                    # and catch any exception.
+                    #
+                    # "Better ask for forgiveness than permission", they say... :°
 
                     try:
                         with open(rpath, 'rb') as file:

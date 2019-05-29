@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 """NBuild: Raven-OS's automated package builder for lazy maintainers"""
 
+import sys
 import os
 import re
 import importlib.util
 import core.args
+import core.config
 import stdlib.log
-from dotenv import load_dotenv
 from multiprocessing import cpu_count
 
 
@@ -24,6 +25,18 @@ def main():
 
     if core.args.get_args().manifest is None:
         stdlib.log.flog("No path to a build manifest given.")
+        exit(1)
+
+    try:
+        core.config.load_config()
+    except Exception as e:
+        stdlib.log.flog(str(e))
+        exit(1)
+
+    try:
+        _ = core.config.get_config()['global']['target']
+    except:
+        stdlib.log.flog("The configuration file doesn't indicate the target repository.")
         exit(1)
 
     # Clear environment, inflate a default one
@@ -71,8 +84,9 @@ def main():
     os.environ['PATH'] = '/bin:/sbin/:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/bin'
     os.environ['MAKEFLAGS'] = f'-j{cpu_count() + 1}'
 
-    # Override those with the ones within the .env file.
-    load_dotenv(dotenv_path='.env', override=True)
+    # Override environment with the content of the config file
+    if 'env' in core.config.get_config():
+        os.environ.update(core.config.get_config()['env'])
 
     manifest_path = core.args.get_args().manifest
     spec = importlib.util.spec_from_file_location('build_manifest', manifest_path)

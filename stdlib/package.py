@@ -8,10 +8,11 @@ import shutil
 import tarfile
 import toml
 import datetime
-import stdlib.log
-import stdlib.kind
 import braceexpand
 import glob
+import core.config
+import stdlib.log
+import stdlib.kind
 from typing import List, Dict
 from termcolor import colored
 
@@ -41,8 +42,7 @@ class PackageID():
     ):
         build = stdlib.build.current_build()
 
-        import core.args
-        self.repository = repository if repository is not None else core.args.get_args().repository
+        self.repository = repository or core.config.get_config()['global']['target']
         self.category = category if category is not None else build.manifest.metadata.category
         self.version = version if version is not None else build.semver
         self.name = name
@@ -331,16 +331,33 @@ class Package():
         """
         stdlib.log.slog(f"Wrapping {self.id} ({self.wrap_cache})")
 
+        stdlib.log.slog(f"Manifest:")
+        with stdlib.log.pushlog():
+            stdlib.log.slog(f"name: {self.id.name}")
+            stdlib.log.slog(f"category: {self.id.category}")
+            stdlib.log.slog(f"version: {self.id.version}")
+            stdlib.log.slog(f"description: {self.description}")
+            stdlib.log.slog(f"tags: {', '.join(self.tags)}")
+            stdlib.log.slog(f"maintainer: {self.maintainer}")
+            stdlib.log.slog(f"licenses: {', '.join(map(lambda l: l.value, self.licenses))}")
+            stdlib.log.slog(f"upstream_url: {self.upstream_url}")
+            stdlib.log.slog(f"kind: {self.kind.value}")
+            stdlib.log.slog(f"wrap_date: {datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'}")
+            stdlib.log.slog(f"dependencies:")
+            with stdlib.log.pushlog():
+                for (full_name, version_req) in self.run_dependencies.items():
+                    stdlib.log.slog(f"{full_name}#{version_req}")
+
         if self.kind == stdlib.kind.Kind.EFFECTIVE:
             with stdlib.pushd(self.wrap_cache):
                 files_count = 0
-                stdlib.log.ilog("Files added:")
+                stdlib.log.slog("Files added:")
                 with stdlib.log.pushlog():
                     for root, _, filenames in os.walk('.'):
                         for filename in filenames:
-                            stdlib.log.ilog(_colored_path(os.path.join(root, filename)))
+                            stdlib.log.slog(_colored_path(os.path.join(root, filename)))
                             files_count += 1
-                stdlib.log.ilog(f"(That's {files_count} files.)")
+                stdlib.log.slog(f"(That's {files_count} files.)")
 
                 stdlib.log.slog("Creating data.tar.gz")
                 tarball_path = os.path.join(self.package_cache, 'data.tar.gz')

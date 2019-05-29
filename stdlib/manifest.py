@@ -229,7 +229,7 @@ def manifest(
             stdlib.log.slog(f"Installing build dependency \"{build_dep}\"")
 
         for build in manifest.builds():
-            stdlib.log.slog(f"Building {build}")
+            stdlib.log.slog(f"Building {build} for \"{core.config.get_config()['global']['target']}\"")
 
             # Save state before building
             with stdlib.pushd(), stdlib.pushenv():
@@ -237,7 +237,7 @@ def manifest(
                     pkgs = build.build()
 
                 # Wrap packages
-                for pkg in pkgs:
+                for pkg in pkgs.values():
                     with stdlib.log.pushlog():
                         pkg.wrap()
 

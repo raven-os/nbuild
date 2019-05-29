@@ -1,0 +1,17 @@
+[global]
+# The target repository the built packages will belong to.
+target = "example"
+
+[env]
+# Override the default environment variable here.
+# NAME = "value"
+
+# A list of related repositories used in a variety of contexts.
+[repositories.stable]
+url = "https://stable.raven-os.org"
+
+[repositories.beta]
+url = "https://beta.raven-os.org"
+
+[repositories.unstable]
+url = "https://unstable.raven-os.org"

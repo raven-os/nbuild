@@ -42,7 +42,7 @@ class PackageID():
     ):
         build = stdlib.build.current_build()
 
-        self.repository = repository if repository is not None else core.config.get_config()['global']['target']
+        self.repository = repository or core.config.get_config()['global']['target']
         self.category = category if category is not None else build.manifest.metadata.category
         self.version = version if version is not None else build.semver
         self.name = name

@@ -12,7 +12,6 @@ from typing import Dict
 def standard() -> Dict[str, stdlib.package.Package]:
     """
     A standard splitter for applications that will try to build the following packages given a build named ``xxx``:
-
       * ``xxx``, containing the different binaries, configuration, manuals and shared files.
       * ``xxx-doc``, containing the offline documentation.
 

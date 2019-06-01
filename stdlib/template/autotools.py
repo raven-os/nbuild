@@ -144,6 +144,13 @@ def build(
             with stdlib.log.pushlog():
                 packages = split()
 
+                if len(packages) > 0:
+                    stdlib.log.ilog("The following packages were generated:")
+
+                    with stdlib.log.pushlog():
+                        for package in packages.values():
+                            stdlib.log.ilog(str(package))
+
         stdlib.log.ilog("Step 9/9: Dependency Linking")
         if deplinker is not None:
             with stdlib.log.pushlog():

@@ -18,7 +18,7 @@ def standard() -> Dict[str, stdlib.package.Package]:
       * ``xxx-dev``, containing all the headers, static libraries, symlinked shared object files and manuals (2, 3).
       * ``xxx-doc``, containing the offline documentation.
 
-    Dependencies are as follow:
+    Dependencies are as follows:
 
       * ``xxx`` has no pre-defined dependency.
       * ``sys-apps/xxx`` depends on the exact version of ``xxx``.
@@ -34,7 +34,7 @@ def standard() -> Dict[str, stdlib.package.Package]:
 
     devel = stdlib.package.Package(
         stdlib.package.PackageID(f'{build.manifest.metadata.name}-dev'),
-        description=f"Headers and manuals to compile or write a software using the {library.id.short_name()} library.",
+        description=f"Headers and manuals to compile or write software using the {library.id.short_name()} library.",
     )
 
     binary = stdlib.package.Package(

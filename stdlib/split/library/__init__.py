@@ -12,12 +12,14 @@ from typing import Dict
 def standard() -> Dict[str, stdlib.package.Package]:
     """
     A standard splitter for system libraries that will try to build the following packages given a build named ``xxx``:
+
       * ``xxx``, containing all the librairies, manuals (4, 5, 7, 8), configuration and relevant shared files.
       * ``sys-apps/xxx``, containing all the binaries, manuals (1, 6, 9) and relevant shared files.
       * ``xxx-dev``, containing all the headers, static libraries, symlinked shared object files and manuals (2, 3).
       * ``xxx-doc``, containing the offline documentation.
 
     Dependencies are as follow:
+
       * ``xxx`` has no pre-defined dependency.
       * ``sys-apps/xxx`` depends on the exact version of ``xxx``.
       * ``xxx-dev`` depends on the exact version of ``xxx``.

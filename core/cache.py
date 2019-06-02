@@ -88,18 +88,17 @@ def get_package_cache(package) -> str:
 
     This cache is populated automatically at the end of the build process. A build manifest should not have to write anything to it.
 
-    :info: This cache is populated by Package.wrap() and contains the manifest and data of the package
+    :info: This cache is populated by Package.wrap() and contains the NPF representing the package
     :param package: The package associated with the cache
     :type package: :py:class:`.Package`
 
-    :returns: The path pointing to the cache where the files belonging to the given package should be stored
+    :returns: The path pointing to the cache where the NPF representing given package should be stored
     """
     return os.path.join(
         core.args.get_args().output_dir,
         package.id.repository,
         package.id.category,
         package.id.name,
-        package.id.version,
     )
 
 

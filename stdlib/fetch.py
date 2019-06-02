@@ -95,6 +95,8 @@ def fetch_file(file: str):
             build.build_cache,
         )
 
+    stdlib.log.slog(f"Fetched {file}.")
+
 
 def fetch_url(url: str, sha256: str = None):
     """Download a file from an URL and ensure its integrity

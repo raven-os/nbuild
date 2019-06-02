@@ -64,6 +64,13 @@ class Build():
         os.chdir(self.build_cache)
         return self.manifest.instructions(self)
 
+    def is_empty(self) -> bool:
+        """Test whether the content of the build's ``install_cache`` is empty."""
+        for _, _, filenames in os.walk(self.install_cache):
+            if len(filenames):
+                return False
+        return True
+
 
 def current_build() -> Build:
     """Return the :py:class:`.Build` currently being executed.

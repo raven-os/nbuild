@@ -329,31 +329,34 @@ class Package():
         """Wrap the package by creating all the files needed by the repository (``nest-server``) to publish the package and putting
         them in the path referred to by ``self.package_cache``
         """
-        stdlib.log.slog(f"Wrapping {self.id} ({self.wrap_cache})")
 
-        stdlib.log.slog(f"Manifest:")
+        stdlib.log.slog(f"name: {self.id.name}")
+        stdlib.log.slog(f"category: {self.id.category}")
+        stdlib.log.slog(f"version: {self.id.version}")
+        stdlib.log.slog(f"description: {self.description}")
+        stdlib.log.slog(f"tags: {', '.join(self.tags)}")
+        stdlib.log.slog(f"maintainer: {self.maintainer}")
+        stdlib.log.slog(f"licenses: {', '.join(map(lambda l: l.value, self.licenses))}")
+        stdlib.log.slog(f"upstream_url: {self.upstream_url}")
+        stdlib.log.slog(f"kind: {self.kind.value}")
+        stdlib.log.slog(f"wrap_date: {datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'}")
+        stdlib.log.slog(f"dependencies:")
         with stdlib.log.pushlog():
-            stdlib.log.slog(f"name: {self.id.name}")
-            stdlib.log.slog(f"category: {self.id.category}")
-            stdlib.log.slog(f"version: {self.id.version}")
-            stdlib.log.slog(f"description: {self.description}")
-            stdlib.log.slog(f"tags: {', '.join(self.tags)}")
-            stdlib.log.slog(f"maintainer: {self.maintainer}")
-            stdlib.log.slog(f"licenses: {', '.join(map(lambda l: l.value, self.licenses))}")
-            stdlib.log.slog(f"upstream_url: {self.upstream_url}")
-            stdlib.log.slog(f"kind: {self.kind.value}")
-            stdlib.log.slog(f"wrap_date: {datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'}")
-            stdlib.log.slog(f"dependencies:")
-            with stdlib.log.pushlog():
-                for (full_name, version_req) in self.run_dependencies.items():
-                    stdlib.log.slog(f"{full_name}#{version_req}")
+            for (full_name, version_req) in self.run_dependencies.items():
+                stdlib.log.slog(f"{full_name}#{version_req}")
+        stdlib.log.slog()
 
         if self.kind == stdlib.kind.Kind.EFFECTIVE:
             with stdlib.pushd(self.wrap_cache):
                 files_count = 0
                 stdlib.log.slog("Files added:")
                 with stdlib.log.pushlog():
-                    for root, _, filenames in os.walk('.'):
+                    for root, dirnames, filenames in os.walk('.'):
+                        for dirname in dirnames:
+                            abspath = os.path.join(root, dirname)
+                            if os.path.islink(abspath):
+                                stdlib.log.slog(_colored_path(abspath))
+                                files_count += 1
                         for filename in filenames:
                             stdlib.log.slog(_colored_path(os.path.join(root, filename)))
                             files_count += 1

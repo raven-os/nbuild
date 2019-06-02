@@ -4,7 +4,7 @@
 
 import os
 import core
-import stdlib
+import stdlib.log
 import subprocess
 
 

@@ -152,9 +152,8 @@ class Package():
             shutil.rmtree(self.wrap_cache)
         os.makedirs(self.wrap_cache)
 
-        if os.path.exists(self.package_cache):
-            shutil.rmtree(self.package_cache)
-        os.makedirs(self.package_cache)
+        if not os.path.exists(self.package_cache):
+            os.makedirs(self.package_cache)
 
     def is_empty(self) -> bool:
         """Test whether the ``wrap_cache`` of this :py:class:`.Package` contains at least a single file.
@@ -389,7 +388,7 @@ class Package():
             }
             toml.dump(manifest, filename)
 
-        stdlib.log.slog("Creating package.nest")
+        stdlib.log.slog(f"Creating {self.id.name}-{self.id.version}.nest")
         with stdlib.pushd(self.package_cache):
             nest_file = os.path.join(self.package_cache, f'{self.id.name}-{self.id.version}.nest')
             with tarfile.open(nest_file, mode='w') as archive:

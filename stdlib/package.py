@@ -325,6 +325,83 @@ class Package():
                         else:
                             os.remove(src)
 
+    def make_keepers(self, *keepers: str):
+        """Create a hidden files in each given repositories.
+
+        :note: This ensure the directories aren't empty when the package will be wrapped and therefore won't be skipped.
+
+        :param keepers: The paths pointing to the directory where the hidden files should be created,
+            relative to the ``wrap_cache`` of this :py:class:`.Package`.
+        """
+        for keeper in keepers:
+            if os.path.isabs(keeper):
+                raise RuntimeError("Package.make_keeper() received an absolute path as parameter, but it expects a relative one")
+
+            path = os.path.join(
+                self.wrap_cache,
+                keeper,
+                '.nestkeep',
+            )
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            open(path, 'w+')
+
+    def make_symlink(self, src: str, dst: str):
+        """Create the symlink ``dst`` pointing to ``src``.
+
+        Ex::
+
+            package.make_symlink('bash', 'bin/sh')  # Creates the symlink "/bin/sh -> bash", which resolves to "/bin/bash"
+
+        :param src: The path where the symlink points to.
+        :param dst: The path where the symlink should be located, relative to the ``wrap_cache`` of this :py:class:`.Package`.
+        """
+        if os.path.isabs(src):
+            stdlib.log.wlog("The use of an absolute path as the target of a symbolic link is discouraged.")
+
+        if os.path.isabs(dst):
+            raise RuntimeError("Package.make_symlink() received an absolute path as parameter, but it expects a relative one")
+
+        dst = os.path.join(
+            self.wrap_cache,
+            dst,
+        )
+
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        os.symlink(src, dst)
+
+    def depends_on(self, package, version_req: str=None):
+        """Mark the given package as a dependency of the current package.
+
+        This is equivalent to adding the requirement manually through ``self.run_dependencies``, but
+        the requirement is made automatically.
+
+        :param package: The package that this package depends on.
+        :paramtype package: :py:class:`.Package`
+
+        :param version_req: The version of ``package`` required to fulfill this requirement.
+            It must be expressed using Sementic Versioning 2.0.0 requirements syntax, like ``>=2.0.0`` or ``~1.5.2``.
+            If ``None`` is given, the requirement is the exact version of ``package``.
+            The default value is ``None``.
+        """
+        if version_req is None:
+            version_req = f'={package.id.version}'
+        self.run_dependencies[package.id.full_name()] = version_req
+
+    def rdepends_on(self, short_name: str, version_req: str, repository: str=None):
+        """Add a new dependency for the current package formed by the given package short name, the targetted repository, and the given version requirement.
+
+        This is equivalent to adding the requirement manually through ``self.run_dependencies``, but
+        the requirement is made automatically and the targetted repository doesn't have to be hardly written in the build manifest.
+
+        :param short_name: The short name this package depends on
+
+        :param version_req: The version of ``short_name`` required to fulfill this requirement.
+            It must be expressed using Sementic Versioning 2.0.0 requirements syntax, like ``>=2.0.0`` or ``~1.5.2``.
+        """
+        target = core.config.get_config()['global']['target']
+
+        self.run_dependencies[f'{target}::{short_name}'] = version_req
+
     def wrap(self):
         """Wrap the package by creating all the files needed by the repository (``nest-server``) to publish the package and putting
         them in the path referred to by ``self.package_cache``

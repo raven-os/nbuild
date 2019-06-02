@@ -146,7 +146,7 @@ class BuildManifest():
 
     .. _Semantic Versioning 2.0.0: https://semver.org/spec/v2.0.0.html
 
-    :param path: The path where the build manifest is stored
+    :param path: The absolute path where the build manifest is stored
     :param metadata: A set of values used as a reference when filling the metadata of the built packages
     :param versionized_args: A list of dictionaries used as a generic way to give arguments to each versions of the build.
         See the above explanations for its exact structure and limitations.
@@ -155,7 +155,7 @@ class BuildManifest():
         associated :py:class:`.Package` as the value.
     :type instructions: fn (:py:class:`~stdlib.build.Build`) -> ``Dict`` [ ``str``, :py:class:`~stdlib.package.Package` ]
 
-    :ivar path: The path where the build manifest is stored
+    :ivar path: The absolute path where the build manifest is stored
     :vartype path: ``str``
 
     :ivar metadata: A set of values used as a reference when filling the metadata of the built packages
@@ -178,6 +178,8 @@ class BuildManifest():
         self.versionized_args = versionized_args
         self.instructions = instructions
         self.path = path
+
+        assert(os.path.isabs(self.path))
 
     def builds(self):
         """Aggregate all the builds for this manifest into a list, one per version.
@@ -218,7 +220,7 @@ def manifest(
     def exec_manifest(builder):
         metadata = BuildManifestMetadata(**kwargs)
         manifest = BuildManifest(
-            core.args.get_args().manifest,
+            os.path.realpath(core.args.get_args().manifest),
             metadata,
             versions_data,
             builder,

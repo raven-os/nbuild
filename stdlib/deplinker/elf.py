@@ -117,8 +117,8 @@ def elf_deplinker(
                 if local_resolving and dependency in binaries.keys():
                     dependency_id = binaries[dependency]
 
-                    requirements.update({dependency_id.full_name(): f'={dependency_id.version}'})
-                    stdlib.log.slog(f"Found locally: {dependency_id.full_name()}#={dependency_id.version}")
+                    requirements.update({dependency_id.full_name(): '*'})
+                    stdlib.log.slog(f"Found locally: {dependency_id.full_name()}#*")
                     continue
                 elif remote_resolving:
                     with stdlib.log.pushlog():

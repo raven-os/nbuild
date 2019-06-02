@@ -153,7 +153,7 @@ class Package():
         os.makedirs(self.wrap_cache)
 
         if not os.path.exists(self.package_cache):
-        os.makedirs(self.package_cache)
+            os.makedirs(self.package_cache)
 
     def is_empty(self) -> bool:
         """Test whether the ``wrap_cache`` of this :py:class:`.Package` contains at least a single file.

@@ -262,6 +262,4 @@ def manifest(
 
             stdlib.log.slog(f"Done!")
 
-            stdlib.log.slog(f"Done!")
-
     return exec_manifest

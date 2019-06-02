@@ -330,20 +330,20 @@ class Package():
         them in the path referred to by ``self.package_cache``
         """
 
-            stdlib.log.slog(f"name: {self.id.name}")
-            stdlib.log.slog(f"category: {self.id.category}")
-            stdlib.log.slog(f"version: {self.id.version}")
-            stdlib.log.slog(f"description: {self.description}")
-            stdlib.log.slog(f"tags: {', '.join(self.tags)}")
-            stdlib.log.slog(f"maintainer: {self.maintainer}")
-            stdlib.log.slog(f"licenses: {', '.join(map(lambda l: l.value, self.licenses))}")
-            stdlib.log.slog(f"upstream_url: {self.upstream_url}")
-            stdlib.log.slog(f"kind: {self.kind.value}")
-            stdlib.log.slog(f"wrap_date: {datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'}")
-            stdlib.log.slog(f"dependencies:")
-            with stdlib.log.pushlog():
-                for (full_name, version_req) in self.run_dependencies.items():
-                    stdlib.log.slog(f"{full_name}#{version_req}")
+        stdlib.log.slog(f"name: {self.id.name}")
+        stdlib.log.slog(f"category: {self.id.category}")
+        stdlib.log.slog(f"version: {self.id.version}")
+        stdlib.log.slog(f"description: {self.description}")
+        stdlib.log.slog(f"tags: {', '.join(self.tags)}")
+        stdlib.log.slog(f"maintainer: {self.maintainer}")
+        stdlib.log.slog(f"licenses: {', '.join(map(lambda l: l.value, self.licenses))}")
+        stdlib.log.slog(f"upstream_url: {self.upstream_url}")
+        stdlib.log.slog(f"kind: {self.kind.value}")
+        stdlib.log.slog(f"wrap_date: {datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'}")
+        stdlib.log.slog(f"dependencies:")
+        with stdlib.log.pushlog():
+            for (full_name, version_req) in self.run_dependencies.items():
+                stdlib.log.slog(f"{full_name}#{version_req}")
         stdlib.log.slog()
 
         if self.kind == stdlib.kind.Kind.EFFECTIVE:

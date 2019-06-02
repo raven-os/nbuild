@@ -232,14 +232,35 @@ def manifest(
             stdlib.log.slog(f"Building {build} for \"{core.config.get_config()['global']['target']}\"")
 
             # Save state before building
-            with stdlib.pushd(), stdlib.pushenv():
+            with stdlib.pushd(), stdlib.pushenv(), stdlib.log.pushlog():
+                pkgs = build.build()
+
+                if pkgs is None:
+                    stdlib.log.flog("The build manifest returned `None`.")
+                    exit(1)
+
+                # Warn for all files left in the `install_cache` that weren't assigned to a package
+                if not build.is_empty():
+                    stdlib.log.wlog("Some built files haven't been moved to any package:")
                 with stdlib.log.pushlog():
-                    pkgs = build.build()
+                        for root, _, filenames in os.walk(build.install_cache):
+                            for filename in filenames:
+                                abs_path = os.path.join(root, filename)
+                                rpath = os.path.relpath(abs_path, build.install_cache)
+                                stdlib.log.wlog(rpath)
 
                 # Wrap packages
                 for pkg in pkgs.values():
+                    stdlib.log.slog(f"Wrapping {str(pkg)}")
+
+                    if pkg.is_empty() and pkg.kind == stdlib.kind.Kind.EFFECTIVE:
+                        stdlib.log.wlog("The package is empty -- Skipping")
+                        continue
+
                     with stdlib.log.pushlog():
                         pkg.wrap()
+
+            stdlib.log.slog(f"Done!")
 
             stdlib.log.slog(f"Done!")
 

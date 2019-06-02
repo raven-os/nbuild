@@ -1,0 +1,7 @@
+/packages/
+/build/
+/cache/
+/docs/
+/config.toml
+/.git
+/.gitignore

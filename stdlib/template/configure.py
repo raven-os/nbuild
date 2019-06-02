@@ -114,7 +114,7 @@ def configure(
     # Call the configure script
     stdlib.cmd(f''' \
         {binary} \
-            --build="{os.environ['TARGET']}" \
+            --target="{os.environ['TARGET']}" \
             --host="{os.environ['HOST']}" \
             \
             --enable-stack-protector=all \

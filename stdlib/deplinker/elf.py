@@ -164,8 +164,8 @@ def _solve_remotely(dependency) -> Optional[str]:
                     stdlib.log.elog(f"\"{repository}\" doesn't contain any package with file \"{dependency}\"")
             elif r.status_code == 404:
                 stdlib.log.elog(f"\"{repository}\" doesn't contain a package with file \"{dependency}\"")
-            else Exception as e:
-                raise RuntimeError(f"Failed to fetch the repository's content: {e}")
+            else:
+                raise RuntimeError(f"Repository returned an unknown status code: {r.status_code}")
         except:
             stdlib.log.elog(f"An unknown error occurred when fetching \"{repository}\" (is the link dead?), skipping...")
 

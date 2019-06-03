@@ -46,8 +46,7 @@ def flat_extract(
     with tarfile.open(path, mode='r') as tar:
         try:
             main_dir = os.path.commonpath(tar.getnames())
-        except Exception as e:
-            print(f"Error: {e}")
+        except:
             pass
         tar.extractall()
 

@@ -22,7 +22,7 @@ def fetch():
         * ``url``: the function :py:func:`.fetch_url` is called with the remaining values as arguments.
         * ``file``: the function :py:func:`.fetch_file` is called with the remaining values as arguments.
 
-    If the dictionary contains both the key ``url`` and ``file``, a ``RuntimeError`` is raised.
+    If the dictionary contains both the key ``url`` and ``file``, a ``ValueError`` is raised.
 
     *Example:* ::
 
@@ -59,18 +59,18 @@ def fetch():
             elif 'file' in input:
                 fetch_file(**input)
         else:
-            raise RuntimeError("A single entry of data given to fetch() contains either no `url` or `file` key, or both of them.")
+            raise ValueError("A single entry of data given to fetch() contains either no `url` or `file` key, or both of them.")
 
 
 def fetch_file(file: str):
     """Copy a file or directory to the current build cache.
 
-    :note: The path must be relative to the build manifest. If an absolute path is given, a ``RuntimeError`` is raised.
+    :note: The path must be relative to the build manifest. If an absolute path is given, a ``ValueError`` is raised.
 
     :param file: The file or directory to copy.
     """
     if os.path.isabs(file):
-        raise RuntimeError("fetch_file() received an absolute path as parameter, while it expects a relative one")
+        raise ValueError("fetch_file() received an absolute path as parameter, while it expects a relative one")
 
     build = stdlib.build.current_build()
 

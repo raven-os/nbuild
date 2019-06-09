@@ -12,7 +12,7 @@ from typing import Dict
 
 def system() -> Dict[str, stdlib.package.Package]:
     """
-    A standard splitter for system application and libraries that will try to build the following packages given a build named ``xxx``:
+    A standard splitter for system applications and libraries that will try to build the following packages given a build named ``xxx``:
 
       * ``xxx``, containing all the applications, librairies, manuals (1, 4, 5, 6, 7, 8, 9), configuration and shared files.
       * ``xxx-dev``, containing all the headers, static libraries, symlinked shared object files and manuals (2, 3).

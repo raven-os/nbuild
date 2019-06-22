@@ -7,6 +7,7 @@ import tarfile
 import stdlib
 import glob
 import shutil
+import itertools
 
 
 def extract(
@@ -24,7 +25,7 @@ def extract(
 
 def extract_all():
     """Extract all tarballs of the current directory in the current directory."""
-    for tarball in glob.glob('*.tar.gz'):
+    for tarball in itertools.chain(glob.glob('*.tar.gz'), glob.glob('*.tar.xz')):
         extract(tarball)
 
 
@@ -43,13 +44,13 @@ def flat_extract(
     main_dir = None
 
     with tarfile.open(path, mode='r') as tar:
-        common = os.path.commonpath(tar.getnames())
-        member = tar.getmember(common)
-        if member is not None and member.isdir():
-            main_dir = member.name
+        try:
+            main_dir = os.path.commonpath(tar.getnames())
+        except:
+            pass
         tar.extractall()
 
-    if main_dir is not None:
+    if main_dir is not None and os.path.exists(main_dir) and os.path.isdir(main_dir):
         for f in os.listdir(main_dir):
             shutil.move(
                 os.path.join(main_dir, f),
@@ -66,5 +67,5 @@ def flat_extract_all():
     If any tarball contains a single folder, the content of the folder is moved in the current directory
     and the folder, now empty, is removed.
     """
-    for tarball in glob.glob('*.tar.gz'):
+    for tarball in itertools.chain(glob.glob('*.tar.gz'), glob.glob('*.tar.xz')):
         flat_extract(tarball)

@@ -190,10 +190,10 @@ class Package():
         # Move to source directory
         with stdlib.pushd(build.install_cache):
             for rglob in paths:
-                for rglob in braceexpand.braceexpand(paths):  # Expand braces
+                for rglob in braceexpand.braceexpand(rglob):  # Expand braces
 
                     if os.path.isabs(rglob):
-                        raise RuntimeError("Package.drain() received an absolute path as parameter, but it expects a relative one")
+                        raise ValueError("Package.drain() received an absolute path as parameter, but it expects a relative one")
 
                     for rpath in glob.glob(rglob):  # Expand globbing
                         dstpath = os.path.join(
@@ -232,7 +232,7 @@ class Package():
                 for rglob in braceexpand.braceexpand(rglob):  # Expand braces
 
                     if os.path.isabs(rglob):
-                        raise RuntimeError("Package.drain_package() received an absolute path as parameter, but it expects a relative one")
+                        raise ValueError("Package.drain_package() received an absolute path as parameter, but it expects a relative one")
 
                     for rpath in glob.glob(rglob):  # Expand globbing
                         dstpath = os.path.join(
@@ -269,7 +269,7 @@ class Package():
         build = stdlib.build.current_build()
 
         if os.path.isabs(src) or os.path.isabs(dst):
-            raise RuntimeError("Package.drain_build_cache() received an absolute path as parameter, but it expects a relative one")
+            raise ValueError("Package.drain_build_cache() received an absolute path as parameter, but it expects a relative one")
 
         # Move to source directory
         with stdlib.pushd(build.build_cache):
@@ -292,15 +292,16 @@ class Package():
         :param dst: A path pointing to the destination folder, relative to the ``wrap_cache`` of this :py:class:`.Package`.
         """
 
-        if os.path.isabs(srcs) or os.path.isabs(dst):
-            raise RuntimeError("Package.move() received an absolute path as parameter, but it expects a relative one")
-
-        if not os.path.isdir(dst):
-            raise RuntimeError("Package.move() did not receive a path pointing to a directory as paramter")
+        if os.path.isabs(dst):
+            raise ValueError("Package.move() received an absolute path as parameter, but it expects a relative one")
 
         with stdlib.pushd(self.wrap_cache):
             for srcs in braceexpand.braceexpand(srcs):  # Expand braces
                 for src in glob.glob(srcs):  # Expand globbing
+
+                    if os.path.isabs(src):
+                        raise ValueError("Package.move() received an absolute path as parameter, but it expects a relative one")
+
                     os.makedirs(os.path.dirname(dst), exist_ok=True)  # Create parent directories (if any)
                     shutil.move(src, dst)
 
@@ -315,7 +316,7 @@ class Package():
             for file in files:
 
                 if os.path.isabs(file):
-                    raise RuntimeError("Package.remove() received an absolute path as parameter, but it expects a relative one")
+                    raise ValueError("Package.remove() received an absolute path as parameter, but it expects a relative one")
 
                 for srcs in braceexpand.braceexpand(file):  # Expand braces
                     for src in glob.glob(srcs):  # Expand globbing

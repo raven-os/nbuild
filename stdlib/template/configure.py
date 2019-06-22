@@ -24,6 +24,7 @@ def get_dir_flags() -> List[str]:
     """
     return [
         '--prefix="/usr"',
+        '--exec-prefix="/usr"',
         '--bindir="/usr/bin"',
         '--sbindir="/usr/bin"',
         '--libdir="/usr/lib64"',

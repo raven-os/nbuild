@@ -55,9 +55,6 @@ def get_feature_flags() -> List[str]:
     :returns: A list of flags that can be given to a configure script.
     """
     return [
-        '--with-curses',
-        '--with-cursesw',
-        '--with-ncurses',
         '--with-ncursesw',
         '--with-pthreads',
         '--with-threads',
@@ -66,31 +63,23 @@ def get_feature_flags() -> List[str]:
     ]
 
 
-def get_flags() -> List[str]:
-    """Build a list of system-wide flags used by the :py:func:`.configure` template.
-
-    :returns: The merged output of :py:func:`.get_dir_flags` and :py:func:`.get_feature_flags`.
-    """
-    return get_dir_flags() + get_feature_flags()
-
-
 def configure(
     *flags: str,
-    system_flags: bool = True,
+    directory_flags: bool = True,
+    feature_flags: bool = True,
     binary: str = './configure',
 ):
     """Run ``./configure`` with a specific set of arguments.
 
-    The flags given to the configure script are both the return value of :py:func:`.get_flags()` and the given ``flags``.
 
-    Some configure scripts abort on unknown flags. If ``system_flags`` is ``False``, the default system flags
-    usually provided by this template won't be infused in the final call, making it more flexible for such
-    configure scripts.
+    Some configure scripts abort on unknown flags. If ``feature_flags`` or ``directory_flags`` is ``False``, the
+    default system flags usually provided by this template won't be infused in the final call, making it more flexible
+    for such configure scripts.
 
-    In such cases, it is recommended to filter-out the bad flags from the return value of :py:func:`.get_flags` instead of
-    rebuilding them by hand and taking the risk of missing some of them.
+    In such cases, it is recommended to filter-out the bad flags from the return value of :py:func:`.get_dir_flags` and
+    :py:func:`.get_feature_flags` instead of rebuilding them by hand and taking the risk of missing some of them.
 
-    Even if ``system_flags`` is ``False``, some core flags will remain infused.
+    Even if both ``directory_flags`` and ``feature_flags`` are ``False``, some core flags will remain infused.
     If such flags are the cause of any error from the configure script, it is recommended to run ``./configure``
     manually, using :py:func:`~stdlib.cmd.cmd`.
 
@@ -102,21 +91,23 @@ def configure(
         to easily disable a feature or package  with its ``--without-PACKAGE``/``--disable-FEATURE`` equivalent.
 
     :param flags: A list of flags to give to the configure script.
-    :param system_flags: Indicate whether or not the template should include the system flags returned by :py:func:`.get_flags`.
-        The default value is ``True``.
+    :param directory_flags: If ``True``, the return value of :py:func:`.get_dir_flags` is prepended to ``flags``.
+    :param feature_flags: If ``True``, the return value of :py:func:`.get_feature_flags` is prepended to ``flags``.
     :param binary: A path pointing to the configure script. The default value is ``./configure``, therefore assuming
         the configure script is in the current directory.
     """
 
     # Inflate system flags
-    if system_flags:
-        flags = get_flags() + list(flags)
+    if directory_flags:
+        flags = get_dir_flags() + list(flags)
+
+    if feature_flags:
+        flags = get_feature_flags() + list(flags)
 
     # Call the configure script
     stdlib.cmd(f''' \
         {binary} \
             --target="{os.environ['TARGET']}" \
-            --host="{os.environ['HOST']}" \
             \
             --enable-stack-protector=all \
             --enable-stackguard-randomization \

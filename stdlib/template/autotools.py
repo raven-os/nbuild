@@ -8,7 +8,7 @@ import stdlib
 import stdlib.fetch
 import stdlib.extract
 import stdlib.patch
-import stdlib.split.drain_all
+import stdlib.split.system
 import stdlib.deplinker.elf
 
 from stdlib.template.configure import configure
@@ -24,7 +24,7 @@ def build(
     compile=make,
     check=lambda: make('check', fail_ok=True),
     install=lambda: make('install', f'DESTDIR={stdlib.build.current_build().install_cache}'),
-    split=stdlib.split.drain_all.drain_all,
+    split=stdlib.split.system.system,
     deplinker=stdlib.deplinker.elf.elf_deplinker,
 ):
     """Download, build and wrap a library based on ``autoconf`` and ``make``.
@@ -86,7 +86,7 @@ def build(
 
     **Split**
 
-        This step automatically splits the output of the build into multiple packages. The default value is :py:func:`~stdlib.split.drain_all.drain_all`.
+        This step automatically splits the output of the build into multiple packages. The default value is :py:func:`~stdlib.split.system.system`.
         Alternative splitters can be found in the :py:mod:`~stdlib.split` module.
 
     **Dependency Linking**

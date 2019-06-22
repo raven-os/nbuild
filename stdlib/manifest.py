@@ -29,6 +29,7 @@ Therefore, this field will hold the correct URL for all versions and is easily a
 """
 
 import os
+import textwrap
 import core
 import stdlib.log
 from typing import List, Dict
@@ -90,7 +91,7 @@ class BuildManifestMetadata():
     ):
         self.name = name
         self.category = category
-        self.description = description.replace('\n', ' ').strip()
+        self.description = textwrap.dedent(description).replace('\n', ' ').strip()
         self.tags = tags
         self.maintainer = maintainer
         self.licenses = licenses

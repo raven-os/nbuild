@@ -328,7 +328,7 @@ class Package():
     def make_keepers(self, *keepers: str):
         """Create a hidden files in each given repositories.
 
-        :note: This ensure the directories aren't empty when the package will be wrapped and therefore won't be skipped.
+        :note: This ensures the directories aren't empty when the package is wrapped and therefore won't be skipped.
 
         :param keepers: The paths pointing to the directory where the hidden files should be created,
             relative to the ``wrap_cache`` of this :py:class:`.Package`.
@@ -391,12 +391,12 @@ class Package():
         """Add a new dependency for the current package formed by the given package short name, the targetted repository, and the given version requirement.
 
         This is equivalent to adding the requirement manually through ``self.run_dependencies``, but
-        the requirement is made automatically and the targetted repository doesn't have to be hardly written in the build manifest.
+        the requirement is made automatically and the targeted repository doesn't have to be hardly written in the build manifest.
 
         :param short_name: The short name this package depends on
 
         :param version_req: The version of ``short_name`` required to fulfill this requirement.
-            It must be expressed using Sementic Versioning 2.0.0 requirements syntax, like ``>=2.0.0`` or ``~1.5.2``.
+            It must be expressed using Semantic Versioning 2.0.0 requirements syntax, like ``>=2.0.0`` or ``~1.5.2``.
         """
         target = core.config.get_config()['global']['target']
 

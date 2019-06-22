@@ -179,7 +179,8 @@ class BuildManifest():
         self.instructions = instructions
         self.path = path
 
-        assert(os.path.isabs(self.path))
+        if not os.path.isabs(self.path):
+            raise ValueError("Manifest() received a relative path as parameter, but it expects an absolute one")
 
     def builds(self):
         """Aggregate all the builds for this manifest into a list, one per version.

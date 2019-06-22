@@ -335,7 +335,7 @@ class Package():
         """
         for keeper in keepers:
             if os.path.isabs(keeper):
-                raise RuntimeError("Package.make_keeper() received an absolute path as parameter, but it expects a relative one")
+                raise ValueError("Package.make_keeper() received an absolute path as parameter, but it expects a relative one")
 
             path = os.path.join(
                 self.wrap_cache,
@@ -359,7 +359,7 @@ class Package():
             stdlib.log.wlog("The use of an absolute path as the target of a symbolic link is discouraged.")
 
         if os.path.isabs(dst):
-            raise RuntimeError("Package.make_symlink() received an absolute path as parameter, but it expects a relative one")
+            raise ValueError("Package.make_symlink() received an absolute path as parameter, but it expects a relative one")
 
         dst = os.path.join(
             self.wrap_cache,

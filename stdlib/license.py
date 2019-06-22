@@ -11,6 +11,8 @@ class License(Enum):
     :info: This enumeration is of course incomplete, and will be completed when necessary.
     """
 
+    GPL = 'gpl'
+    LGPL = 'lgpl'
     GPL_V1 = 'gpl_v1'
     GPL_V2 = 'gpl_v2'
     GPL_V3 = 'gpl_v3'

@@ -117,7 +117,8 @@ def elf_deplinker(
                 if local_resolving and dependency in binaries.keys():
                     dependency_id = binaries[dependency]
 
-                    requirements.update({dependency_id.full_name(): '*'})
+                    if dependency_id.full_name() != package_id.full_name():
+                        requirements.update({dependency_id.full_name(): '*'})
                     stdlib.log.slog(f"Found locally: {dependency_id.full_name()}#*")
                     continue
                 elif remote_resolving:
@@ -125,8 +126,11 @@ def elf_deplinker(
                         solver_fullname = _solve_remotely(dependency)
 
                     if solver_fullname is not None:
-                        requirements.update({solver_fullname: '*'})
-                        stdlib.log.slog(f"Found remotely: {solver_fullname}#*")
+                        if solver_fullname == package_id.full_name():
+                            stdlib.log.elog(f"Found remotely by another version of the same package -- Manual dependency linking required!")
+                        else:
+                            requirements.update({solver_fullname: '*'})
+                            stdlib.log.slog(f"Found remotely: {solver_fullname}#*")
                         continue
 
                 stdlib.log.elog(f"Requirement couldn't be solved -- Manual dependency linking required!")

@@ -28,4 +28,6 @@ def drain_all() -> Dict[str, stdlib.package.Package]:
 
     package.drain('*')
 
-    return {package.id.short_name(): package}
+    return {
+        package.id.short_name(): package
+    }

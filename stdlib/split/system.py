@@ -61,7 +61,7 @@ def system() -> Dict[str, stdlib.package.Package]:
         f'usr/{target}/lib{{,32,64}}/*.pc',
         'usr/share/bash-completion/',
         'usr/share/man/man{1,4,5,6,7,8,9}/',
-        'usr/share/locale/',
+        'usr/share/{locale,misc}/',
         'usr/libexec/',
         'etc/',
     )

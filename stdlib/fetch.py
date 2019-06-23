@@ -62,12 +62,13 @@ def fetch():
             raise ValueError("A single entry of data given to fetch() contains either no `url` or `file` key, or both of them.")
 
 
-def fetch_file(file: str):
+def fetch_file(file: str, rename: str=None):
     """Copy a file or directory to the current build cache.
 
     :note: The path must be relative to the build manifest. If an absolute path is given, a ``ValueError`` is raised.
 
-    :param file: The file or directory to copy.
+    :param file: The file or directory to copy, relative to the build manifest.
+    :param rename: If not ``None``, rename the target to ``rename`` after copy.
     """
     if os.path.isabs(file):
         raise ValueError("fetch_file() received an absolute path as parameter, while it expects a relative one")
@@ -79,10 +80,12 @@ def fetch_file(file: str):
         file,
     )
 
+    new_name = rename or os.path.basename(file)
+
     if os.path.isdir(srcpath):
         dstpath = os.path.join(
             build.build_cache,
-            os.path.basename(file),
+            new_name,
         )
 
         shutil.copytree(
@@ -92,7 +95,10 @@ def fetch_file(file: str):
     else:
         shutil.copy(
             srcpath,
-            build.build_cache,
+            os.path.join(
+                build.build_cache,
+                new_name,
+            )
         )
 
     stdlib.log.slog(f"Fetched {file}.")

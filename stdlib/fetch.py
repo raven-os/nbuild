@@ -80,10 +80,7 @@ def fetch_file(file: str, rename: str=None):
         file,
     )
 
-    new_name = rename
-
-    if rename is None:
-        new_name = os.path.basename(file)
+    new_name = rename or os.path.basename(file)
 
     if os.path.isdir(srcpath):
         dstpath = os.path.join(

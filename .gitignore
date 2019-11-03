@@ -116,6 +116,7 @@ dmypy.json
 .pyre/
 
 /packages/
+/manifests/
 /build/
 /cache/
 /docs/build/

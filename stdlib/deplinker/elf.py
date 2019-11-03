@@ -17,9 +17,10 @@ from elftools.elf.elffile import ELFFile
 def elf_deplinker(
     packages,
     search_patterns=[
-        '{,usr/}bin/*',
-        '{,usr/}lib{,32,64}/*',
+        '{,usr/,opt/}{,s}bin/**',
+        '{,usr/,opt/}lib{,32,64}/**',
     ],
+    recursive_patterns: bool = True,
     local_resolving: bool = True,
     remote_resolving: bool = True,
 ):
@@ -41,24 +42,30 @@ def elf_deplinker(
         The default value is: ::
 
             [
-                '{,usr/}}bin/*',
-                '{,usr/}}lib{,32,64}/*',
+                '{,usr/,opt/}}bin/**',
+                '{,usr/,opt/}}lib{,32,64}/**',
             ]
 
         Which expands to: ::
 
             [
-                'bin/*'
-                'usr/bin/*'
-                'lib/*'
-                'usr/lib/*'
-                'lib32/*'
-                'usr/lib32/*'
-                'lib64/*'
-                'usr/lib64/*'
+                'bin/**'
+                'usr/bin/**'
+                'opt/bin/**'
+                'lib/**'
+                'usr/lib/**'
+                'opt/lib/**'
+                'lib32/**'
+                'usr/lib32/**'
+                'opt/lib32/**'
+                'lib64/**'
+                'usr/lib64/**'
+                'opt/lib64/**'
             ]
 
     :paramtype search_patterns: ``List`` [ :py:class:`.Package` ]
+    :param recursive_patterns: Indicate whether or not the recursive globbing syntax (``**``) should be supported, as it is quite time-consuming on large
+        directory structures. Default value is ``True``.
     :param local_resolving: Indicate whether or not other packages for ``packages`` should be used to solve dependencies. Default value is ``True``.
     :param remote_resolving: Indicate whether or not remote repositories should be used to solve dependencies. Default value is ``True``.
     """
@@ -66,12 +73,12 @@ def elf_deplinker(
     dependencies = dict()  # Key = a package ID, Value = a list of ELF filenames
 
     for package in packages.values():
-        stdlib.log.ilog(f"ELF Dependency Linker: Looking for binaries and their dependencies in {package.id.full_name()}...")
+        stdlib.log.ilog(f"ELF Dependency Linker: Looking for binaries and their dependencies in {package.id.short_name()}...")
 
         pkg_id = package.id
 
         # Find all elfs in this package
-        elfs = _find_elfs(package, search_patterns)
+        elfs = _find_elfs(package, search_patterns, recursive_patterns)
 
         # Fill the `binaries` dict, to keep track of who owns a binary in the local context
         #
@@ -79,7 +86,7 @@ def elf_deplinker(
         # we're actively checking against it.
         for elf in map(ntpath.basename, elfs):
 
-            if elf in binaries:
+            if elf in binaries and binaries[elf] != pkg_id:
                 stdlib.log.flog(f"Two packages have the same file \"{elf}\": {binaries[elf]} and {pkg_id} -- Aborting")
                 exit(1)
 
@@ -106,8 +113,8 @@ def elf_deplinker(
 
     for (package_id, dependencies) in dependencies.items():
 
-        stdlib.log.ilog(f"ELF Dependency Linker: Solving dependencies of {package_id.full_name()}...")
-        requirements = {}
+        stdlib.log.ilog(f"ELF Dependency Linker: Solving dependencies of {package_id.short_name()}...")
+        requirements = set()
 
         with stdlib.log.pushlog():
 
@@ -117,20 +124,20 @@ def elf_deplinker(
                 if local_resolving and dependency in binaries.keys():
                     dependency_id = binaries[dependency]
 
-                    if dependency_id.full_name() != package_id.full_name():
-                        requirements.update({dependency_id.full_name(): '*'})
-                    stdlib.log.slog(f"Found locally: {dependency_id.full_name()}#*")
+                    if dependency_id.short_name() != package_id.short_name():
+                        requirements.add(dependency_id.short_name())
+                    stdlib.log.slog(f"Found locally: {dependency_id.short_name()}")
                     continue
                 elif remote_resolving:
                     with stdlib.log.pushlog():
-                        solver_fullname = _solve_remotely(dependency)
+                        solver_shortname = _solve_remotely(dependency)
 
-                    if solver_fullname is not None:
-                        if solver_fullname == package_id.full_name():
+                    if solver_shortname is not None:
+                        if solver_shortname == package_id.short_name():
                             stdlib.log.elog(f"Found remotely by another version of the same package -- Manual dependency linking required!")
                         else:
-                            requirements.update({solver_fullname: '*'})
-                            stdlib.log.slog(f"Found remotely: {solver_fullname}#*")
+                            requirements.add(solver_shortname)
+                            stdlib.log.slog(f"Found remotely: {solver_shortname}")
                         continue
 
                 stdlib.log.elog(f"Requirement couldn't be solved -- Manual dependency linking required!")
@@ -144,7 +151,12 @@ def _solve_remotely(dependency) -> Optional[str]:
     if config.get('repositories') is None:
         return None
 
+    solver_shortname = None
+
     # Try all repositories from top to bottom
+    #
+    # They must all provide the same package for a given file, or there
+    # are inconsistencies
     for repository in config['repositories']:
         try:
             url = core.config.get_config()['repositories'][repository]['url']
@@ -160,20 +172,33 @@ def _solve_remotely(dependency) -> Optional[str]:
                     if not result['all_versions']:
                         stdlib.log.elog(f"\"{repository}\" contains a single package with file \"{dependency}\" but not for all versions")
                     else:
-                        stdlib.log.slog(f"\"{repository}\" contains a single package with file \"{dependency}\"!")
-                        return result['name']
+                        short_name = result['name'].split('::')[1]
+                        if solver_shortname is not None and solver_shortname != short_name:
+                            stdlib.log.elog(
+                                f"Inconsistencies found. Both packages {solver_shortname} and {short_name} contain the file \"{dependency}\"" +
+                                "accross multiple repositories"
+                            )
+                            return None
+                        elif solver_shortname is None:
+                            solver_shortname = short_name
+
                 elif len(results) > 1:
                     stdlib.log.elog(f"\"{repository}\" contains more than one package with file \"{dependency}\"")
                 else:
                     stdlib.log.elog(f"\"{repository}\" doesn't contain any package with file \"{dependency}\"")
+
             elif r.status_code == 404:
                 stdlib.log.elog(f"\"{repository}\" doesn't contain a package with file \"{dependency}\"")
             else:
                 raise RuntimeError(f"Repository returned an unknown status code: {r.status_code}")
-        except:
+        except Exception as e:
             stdlib.log.elog(f"An unknown error occurred when fetching \"{repository}\" (is the link dead?), skipping...")
+            print(e)
 
-    return None
+    if solver_shortname is not None:
+        stdlib.log.slog(f"A single package \"{solver_shortname}\" was found with the file \"{dependency}\"!")
+
+    return solver_shortname
 
 
 def _fetch_elf_dependencies(package, elf_path) -> [str]:
@@ -194,13 +219,13 @@ def _fetch_elf_dependencies(package, elf_path) -> [str]:
     return deps
 
 
-def _find_elfs(package, search_patterns) -> [str]:
+def _find_elfs(package, search_patterns, recursive_patterns) -> [str]:
     files = []
 
     with stdlib.pushd(package.wrap_cache):
         for search_pattern in search_patterns:
             for rglob in braceexpand.braceexpand(search_pattern):  # Expand braces
-                for rpath in glob.glob(rglob):  # Expand globbing
+                for rpath in glob.glob(rglob, recursive=recursive_patterns):  # Expand globbing
 
                     # We want to retain ELFs only
                     #

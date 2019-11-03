@@ -21,8 +21,9 @@ def fetch():
 
         * ``url``: the function :py:func:`.fetch_url` is called with the remaining values as arguments.
         * ``file``: the function :py:func:`.fetch_file` is called with the remaining values as arguments.
+        * ``git``: the function :py:func:`.fetch_git` is called with the remaining values as arguments.
 
-    If the dictionary contains both the key ``url`` and ``file``, a ``ValueError`` is raised.
+    If the dictionary contains multiple valid keys, a ``ValueError`` is raised.
 
     *Example:* ::
 
@@ -31,6 +32,9 @@ def fetch():
                 'sha256': '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824'
             }, {
                 'url': 'https://example.com/world.tar.gz',
+            }, {
+                'git': 'https://github.com/torvalds/linux.git',
+                'tag': 'v5.3',
             }, {
                 'file': './hello_world'
             },
@@ -45,6 +49,8 @@ def fetch():
 
         fetch_url(url='https://example.com/world.tar.gz')
 
+        fetch_git(url='https://github.com/torvalds/linux.git', tag='v5.3')
+
         fetch_file(file='./hello_world')
 
     """
@@ -53,13 +59,15 @@ def fetch():
     inputs = build.args.get('fetch', [])
 
     for input in inputs:
-        if ('url' in input) ^ ('file' in input):
+        if ('url' in input) + ('file' in input) + ('git' in input) == 1:
             if 'url' in input:
                 fetch_url(**input)
             elif 'file' in input:
                 fetch_file(**input)
+            elif 'git' in input:
+                fetch_git(**input)
         else:
-            raise ValueError("A single entry of data given to fetch() contains either no `url` or `file` key, or both of them.")
+            raise ValueError("A single entry of data given to fetch() contains either no `url` or `file` key, or a mixture of them.")
 
 
 def fetch_file(file: str, rename: str=None):
@@ -151,7 +159,7 @@ def fetch_url(url: str, sha256: str = None):
 
         stdlib.log.slog(f"Fetch done.")
 
-        if not _check_sha256(install_path, sha256):
+        if sha256 and not _check_sha256(install_path, sha256):
             stdlib.log.flog(
                 "Downloaded file's signature is invalid. "
                 "Please verify the signature(s) in the build manifest "
@@ -163,6 +171,49 @@ def fetch_url(url: str, sha256: str = None):
             install_path,
             build_path,
         )
+
+
+def fetch_git(
+    git: str,
+    tag: str = None,
+    commit: str = None,
+    branch: str = None,
+    folder: str = '.',
+    recursive: bool = True,
+):
+    """Download a file from an URL and ensure its integrity
+
+    The downloaded file is put in the build cache of the current build, but a copy
+    is also stored in the download cache. If :py:func:`.fetch_url` is called again
+    with the same ``url`` argument, the already-downloaded file will be copied
+    instead, avoiding any extra download.
+
+    :note: Only HTTP, HTTPS and FTP protocols are supported.
+
+    :param url: The URL pointing to the file to download.
+    :param sha256: The SHA256 used to ensure the integrity of the file.
+    """
+    build = stdlib.build.current_build()
+
+    if (tag is not None) + (branch is not None) + (commit is not None) > 1:
+        raise ValueError(f"More than one parameter between tag, commit and branch were provided. Please only pick one.")
+
+    if os.path.isabs(folder):
+        raise ValueError("The folder to operate is given as an absolute path. A relative one is expected.")
+
+    if tag is None and commit is None:
+        stdlib.log.elog("No specific commit or tag specified -- The manifest will not produce a deterministic and reliable result.")
+
+    # TODO FIXME: Use libgit instead of using shell commands.
+
+    with stdlib.pushd(build.build_cache):
+        stdlib.log.ilog(f"Cloning {git}...")
+        stdlib.cmd(f"git clone {'--recursive' if recursive else ''} {git} {folder}")
+
+        checkout = tag or branch or commit
+        if checkout is not None:
+            stdlib.log.ilog(f"Checking {checkout}...")
+            stdlib.cmd(f'git checkout {checkout}')
 
 
 def _download_http(url, path):

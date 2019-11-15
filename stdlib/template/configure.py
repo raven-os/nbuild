@@ -113,10 +113,6 @@ def configure(
     # Call the configure script
     stdlib.cmd(f''' \
         {binary} \
-            --host="{os.environ['TARGET']}" \
-            --build="{os.environ['TARGET']}" \
-            --target="{os.environ['TARGET']}" \
-            \
             --enable-stack-protector=all \
             --enable-stackguard-randomization \
             \

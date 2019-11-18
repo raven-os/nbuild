@@ -17,14 +17,14 @@ def distutils_build(
     *args: str,
     python_binary: str = 'python3',
     script_path: str = './setup.py',
-    fail_ok: bool = True,
+    fail_ok: bool = False,
 ):
     """Run ``python3 ./setup.py build``.
 
     :param args: Any extra arguments to give to ``setup.py``
     :param python_binary: The command or path to use. The default value is ``python3``.
     :param script_path: The path to the distutils script. The default value is ``./setup.py``.
-    :param fail_ok: If ``True``, the execution is aborted if ``cargo`` fails.
+    :param fail_ok: If ``False``, the execution is aborted if ``setup.py`` fails.
         The default value is ``False``.
     """
     stdlib.cmd(f'''{python_binary} {script_path} build {' '.join(args)} ''', fail_ok=fail_ok)
@@ -34,14 +34,14 @@ def distutils_check(
     *args: str,
     python_binary: str = 'python3',
     script_path: str = './setup.py',
-    fail_ok: bool = True,
+    fail_ok: bool = False,
 ):
     """Run ``python3 ./setup.py check``.
 
     :param args: Any extra arguments to give to ``setup.py``
     :param python_binary: The command or path to use. The default value is ``python3``.
     :param script_path: The path to the distutils script. The default value is ``./setup.py``.
-    :param fail_ok: If ``True``, the execution is aborted if ``cargo`` fails.
+    :param fail_ok: If ``False``, the execution is aborted if ``setup.py`` fails.
         The default value is ``False``.
     """
     stdlib.cmd(f'''{python_binary} {script_path} check {' '.join(args)} ''', fail_ok=fail_ok)
@@ -51,14 +51,14 @@ def distutils_install(
     *args: str,
     python_binary: str = 'python3',
     script_path: str = './setup.py',
-    fail_ok: bool = True,
+    fail_ok: bool = False,
 ):
     """Run ``python3 ./setup.py install``.
 
     :param args: Any extra arguments to give to ``setup.py``
     :param python_binary: The command or path to use. The default value is ``python3``.
     :param script_path: The path to the distutils script. The default value is ``./setup.py``.
-    :param fail_ok: If ``True``, the execution is aborted if ``cargo`` fails.
+    :param fail_ok: If ``False``, the execution is aborted if ``setup.py`` fails.
         The default value is ``False``.
     """
     build = stdlib.build.current_build()
@@ -169,7 +169,7 @@ def build(
                     for package in packages.values():
                         stdlib.log.ilog(str(package))
 
-    stdlib.log.ilog("Step 9/8: Dependency Linking")
+    stdlib.log.ilog("Step 8/8: Dependency Linking")
     if deplinker is not None:
         with stdlib.log.pushlog():
             deplinker(packages)

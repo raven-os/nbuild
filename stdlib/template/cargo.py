@@ -22,7 +22,7 @@ def cargo_build(
 
     :param args: Any extra arguments to give to cargo
     :param cargo_binary: The command or path to use. The default value is ``cargo``.
-    :param fail_ok: If ``True``, the execution is aborted if ``cargo`` fails.
+    :param fail_ok: If ``False``, the execution is aborted if ``cargo`` fails.
         The default value is ``False``.
     """
     stdlib.cmd(f'''{cargo_binary} build --release {' '.join(args)} ''', fail_ok=fail_ok)
@@ -37,7 +37,7 @@ def cargo_check(
 
     :param args: Any extra arguments to give to cargo
     :param cargo_binary: The command or path to use. The default value is ``cargo``.
-    :param fail_ok: If ``True``, the execution is aborted if ``cargo`` fails.
+    :param fail_ok: If ``False``, the execution is aborted if ``cargo`` fails.
         The default value is ``False``.
     """
     stdlib.cmd(f'''{cargo_binary} check --release {' '.join(args)} ''', fail_ok=fail_ok)
@@ -54,7 +54,7 @@ def cargo_install(
     :param args: Any extra arguments to give to cargo
     :param path: The path pointing to the directory or Cargo manifest to install.
     :param cargo_binary: The command or path to use. The default value is ``cargo``.
-    :param fail_ok: If ``True``, the execution is aborted if ``cargo`` fails.
+    :param fail_ok: If ``False``, the execution is aborted if ``cargo`` fails.
         The default value is ``False``.
     """
     build = stdlib.build.current_build()
@@ -167,7 +167,7 @@ def build(
                     for package in packages.values():
                         stdlib.log.ilog(str(package))
 
-    stdlib.log.ilog("Step 9/8: Dependency Linking")
+    stdlib.log.ilog("Step 8/8: Dependency Linking")
     if deplinker is not None:
         with stdlib.log.pushlog():
             deplinker(packages)

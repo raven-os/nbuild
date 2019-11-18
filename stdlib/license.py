@@ -21,6 +21,7 @@ class License(Enum):
     LGPL_V2_1 = 'lgpl_v2_1'
     LGPL_V3 = 'lgpl_v3'
     BSD = 'bsd'
+    PSF = 'psf'
     MOZILLA = 'mozilla'
     MIT = 'mit'
     APACHE = 'apache'

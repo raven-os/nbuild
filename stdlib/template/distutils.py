@@ -10,7 +10,6 @@ import stdlib.extract
 import stdlib.patch
 import stdlib.split.drain_all
 import stdlib.deplinker.elf
-from multiprocessing import cpu_count
 
 
 def distutils_build(

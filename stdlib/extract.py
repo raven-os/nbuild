@@ -26,7 +26,7 @@ def extract(
 
 def extract_all():
     """Extract all tarballs of the current directory in the current directory."""
-    for xtarball in braceexpand('*.tar.{gz,xz,bz2}'):
+    for xtarball in braceexpand('*.{tar.{gz,xz,bz2},tgz}'):
         for tarball in itertools.chain(glob(xtarball)):
             extract(tarball)
 
@@ -69,6 +69,6 @@ def flat_extract_all():
     If any tarball contains a single folder, the content of the folder is moved in the current directory
     and the folder, now empty, is removed.
     """
-    for xtarball in braceexpand('*.tar.{gz,xz,bz2}'):
+    for xtarball in braceexpand('*.{tar.{gz,xz,bz2},tgz}'):
         for tarball in itertools.chain(glob(xtarball)):
             flat_extract(tarball)

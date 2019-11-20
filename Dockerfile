@@ -1,12 +1,7 @@
-FROM debian:sid
+FROM ravenos/raven-os
 
-RUN apt-get update
-RUN apt install -y -q \
-    python3 \
-    python3-pip \
-    libelf-dev \
-    bc \
-    tree
+RUN yes | nest pull
+RUN yes | nest install essentials-dev
 
 ADD requirements.txt /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements.txt
@@ -16,9 +11,7 @@ WORKDIR /app
 
 # Install nbuild
 ADD . /app
-
-# Some nice aliases
-RUN echo "alias ls='ls --color'\nalias la='ls -la'" >> /root/.bashrc
+ADD config.toml.example /app/config.toml
 
 # Manifests (entry)
 VOLUME /app/manifests

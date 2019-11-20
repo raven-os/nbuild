@@ -229,11 +229,20 @@ def manifest(
         )
 
         # Install build dependencies
-        for build_dep in build_dependencies:
-            stdlib.log.slog(f"Installing build dependency \"{build_dep}\"")
+        if len(build_dependencies) > 0:
+            stdlib.log.slog("installing build dependencies...")
+
+            with stdlib.log.pushlog():
+                for build_dep in build_dependencies:
+                    stdlib.log.slog(f"- {build_dep}")
+
+            stdlib.cmd('echo yes | nest pull')
+            stdlib.cmd(f"echo yes | nest install {' '.join(build_dependencies)}")
+
+            stdlib.log.slog("Dependencies installed!")
 
         for build in manifest.builds():
-            stdlib.log.slog(f"Building {build} for \"{core.config.get_config()['global']['target']}\"")
+            stdlib.log.slog(f"Building {build}")
 
             # Save state before building
             with stdlib.pushd(), stdlib.pushenv(), stdlib.log.pushlog():

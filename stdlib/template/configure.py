@@ -28,11 +28,10 @@ def get_dir_flags() -> List[str]:
         '--bindir="/usr/bin"',
         '--sbindir="/usr/bin"',
         '--libdir="/usr/lib64"',
-        '--libexecdir="/usr/libexec"',
+        '--libexecdir="/usr/lib64"',
         '--includedir="/usr/include"',
         '--datarootdir="/usr/share"',
         '--datadir="/usr/share"',
-        '--infodir="/usr/share/info"',
         '--mandir="/usr/share/man"',
         '--sysconfdir="/etc"',
         '--localstatedir="/var"',
@@ -65,6 +64,7 @@ def get_feature_flags() -> List[str]:
 
 def configure(
     *flags: str,
+    make_configure=None,
     directory_flags: bool = True,
     feature_flags: bool = True,
     binary: str = './configure',
@@ -91,11 +91,17 @@ def configure(
         to easily disable a feature or package  with its ``--without-PACKAGE``/``--disable-FEATURE`` equivalent.
 
     :param flags: A list of flags to give to the configure script.
+    :param make_configure: A function that can be executed before the configure script is run.
+        Useful if the configure script isn't provided and must be generated beforehand.
+        The default value is ``None``.
     :param directory_flags: If ``True``, the return value of :py:func:`.get_dir_flags` is prepended to ``flags``.
     :param feature_flags: If ``True``, the return value of :py:func:`.get_feature_flags` is prepended to ``flags``.
     :param binary: A path pointing to the configure script. The default value is ``./configure``, therefore assuming
         the configure script is in the current directory.
     """
+
+    if make_configure is not None:
+        make_configure()
 
     # Inflate system flags
     if directory_flags:
@@ -107,8 +113,6 @@ def configure(
     # Call the configure script
     stdlib.cmd(f''' \
         {binary} \
-            --target="{os.environ['TARGET']}" \
-            \
             --enable-stack-protector=all \
             --enable-stackguard-randomization \
             \

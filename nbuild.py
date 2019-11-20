@@ -33,54 +33,23 @@ def main():
         stdlib.log.flog(str(e))
         exit(1)
 
-    try:
-        _ = core.config.get_config()['global']['target']
-    except:
-        stdlib.log.flog("The configuration file doesn't indicate the target repository.")
-        exit(1)
-
     # Clear environment, inflate a default one
     os.environ.clear()
 
     # Target and host architecture
     # TODO FIXME Set as parameter
     os.environ['TARGET'] = 'x86_64-raven-linux-gnu'
-    os.environ['HOST'] = 'x86_64-linux-gnu'
 
     # Common flags for the gnu toolchain (cpp, cc, cxx, as, ld)
-    gnuflags = '-O2 -s -m64 -mtune=generic'
+    gnuflags = '-O2 -s -m64 -mtune=generic '
 
-    # Pre-processor
-    os.environ['CPP'] = f'{os.environ["TARGET"]}-cpp'
-    os.environ['HOSTCPP'] = f'{os.environ["HOST"]}-cpp'
-    os.environ['CPPFLAGS'] = gnuflags
-
-    # C Compilers
-    os.environ['CC'] = f'{os.environ["TARGET"]}-gcc'
-    os.environ['HOSTCC'] = f'{os.environ["HOST"]}-gcc'
+    # Compilator flags
     os.environ['CFLAGS'] = gnuflags
-
-    # C++ Compilers
-    os.environ['CXX'] = f'{os.environ["TARGET"]}-g++'
-    os.environ['HOSTCXX'] = f'{os.environ["HOST"]}-g++'
     os.environ['CXXFLAGS'] = gnuflags
-
-    # Assembler
-    os.environ['AS'] = f'{os.environ["TARGET"]}-as'
-    os.environ['HOSTAS'] = f'{os.environ["HOST"]}-as'
-    os.environ['ASFLAGS'] = gnuflags
-
-    # Linker
-    os.environ['LD'] = f'{os.environ["TARGET"]}-ld'
-    os.environ['HOSTLD'] = f'{os.environ["HOST"]}-ld'
     os.environ['LDFLAGS'] = gnuflags
 
-    # Archiver
-    os.environ['AR'] = f'{os.environ["TARGET"]}-ar'
-    os.environ['HOSTAR'] = f'{os.environ["HOST"]}-ar'
-
     # Misc
-    os.environ['TERM'] = 'xterm'
+    os.environ['TERM'] = 'xterm-256color'
     os.environ['PATH'] = '/bin:/sbin/:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/bin'
     os.environ['MAKEFLAGS'] = f'-j{cpu_count() + 1}'
 

@@ -76,7 +76,6 @@ def get_wrap_cache(package) -> str:
     return os.path.join(
         core.args.get_args().cache_dir,
         'wrap',
-        package.id.repository,
         package.id.category,
         package.id.name,
         package.id.version,
@@ -96,7 +95,6 @@ def get_package_cache(package) -> str:
     """
     return os.path.join(
         core.args.get_args().output_dir,
-        package.id.repository,
         package.id.category,
         package.id.name,
     )

@@ -52,16 +52,17 @@ def system() -> Dict[str, stdlib.package.Package]:
 
     main.drain(
         '{,usr/{,local/}}{,s}bin/',
-        '{,usr/{,local/}}lib{,32,64}/*.so.*',
+        '{,usr/{,local/}}lib{,32,64}/**/*.so.*',
         '{,usr/{,local/}}lib{,32,64}/pkgconfig/',
-        '{,usr/{,local/}}lib{,32,64}/*.pc/',
+        '{,usr/{,local/}}lib{,32,64}/**/*.pc/',
         f'usr/{target}/{{,s}}bin/',
-        f'usr/{target}/lib{{,32,64}}/*.so.*',
+        f'usr/{target}/lib{{,32,64}}/**/*.so.*',
         f'usr/{target}/lib{{,32,64}}/pkgconfig/',
-        f'usr/{target}/lib{{,32,64}}/*.pc',
+        f'usr/{target}/lib{{,32,64}}/**/*.pc',
         'usr/share/bash-completion/',
         'usr/share/man/man{1,4,5,6,7,8,9}/',
-        'usr/share/{locale,misc}/',
+        'usr/share/man/*/man{1,4,5,6,7,8,9}/',
+        'usr/share/{locale,aclocal,misc}/',
         'usr/libexec/',
         'etc/',
     )
@@ -78,9 +79,10 @@ def system() -> Dict[str, stdlib.package.Package]:
 
     devel.drain(
         'usr/include/',
-        '{,usr/{,local/}}lib{,32,64}/*.{a,so}',
-        f'usr/lib{{,32,64}}/{target}/*.so.*',
+        '{,usr/{,local/}}lib{,32,64}/**/*.{a,so}',
+        f'usr/lib{{,32,64}}/{target}/**/*.so.*',
         'usr/share/man/man{2,3}/',
+        'usr/share/man/*/man{2,3}/',
     )
 
     devel.move('{lib,usr/local/lib}{,64}/*', 'usr/lib64/')

@@ -18,12 +18,9 @@ from termcolor import colored
 
 
 class PackageID():
-    """The unique identifier of a package: its repository, category, name and version.
+    """The unique identifier of a package: its category, name and version.
 
     :param name: The name of the package. The name should be in ``snake-case``.
-    :param repository: The name of the repository. The name should be in ``snake-case``.
-        If ``None`` is given, the repository name is taken from the arguments given to Nest Build.
-        The default value is ``None``.
     :param category: The name of the category. The name should be in ``snake-case``.
         If ``None`` is given, the category name is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
@@ -36,13 +33,11 @@ class PackageID():
     def __init__(
         self,
         name: str,
-        repository: str = None,
         category: str = None,
         version: str = None,
     ):
         build = stdlib.build.current_build()
 
-        self.repository = repository or core.config.get_config()['global']['target']
         self.category = category if category is not None else build.manifest.metadata.category
         self.version = version if version is not None else build.semver
         self.name = name
@@ -54,21 +49,14 @@ class PackageID():
         """
         return f'{self.category}/{self.name}'
 
-    def full_name(self) -> str:
-        """Return a string representing the full name of the package, which is the combination of its repository, category and name.
-
-        :return: A string representing the full name of the package
-        """
-        return f'{self.repository}::{self.category}/{self.name}'
-
     def __str__(self) -> str:
-        return f'{self.full_name()}#{self.version}'
+        return f'{self.short_name()}#{self.version}'
 
 
 class Package():
     """A package, the output of a :py:class:`~stdlib.build.Build`.
 
-    :param id: The unique identifier of the package, including its name, category, repository and version.
+    :param id: The unique identifier of the package, including its name, category and version.
     :param description: A description of the package. This description should start with an uppercase letter and finish with a dot.
         If ``None`` is given, the description is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
@@ -87,10 +75,10 @@ class Package():
     :param kind: The kind of the package. Effective means the package has data to install, while Virtual means the package has no data to install.
         If ``None`` is given, the kind is taken from the current :py:class:`~stdlib.manifest.BuildManifestMetadata`.
         The default value is ``None``.
-    :param run_dependencies: A dictionary of runtime dependencies. The key is a package's full name, and the value is a version requirement.
-        The default value is ``dict()``.
+    :param run_dependencies: A set of runtime dependencies. Each value is a string representing a package requirement.
+        The default value is ``set()``.
 
-    :ivar id: The unique identifier of the package, including its name, category, repository and version.
+    :ivar id: The unique identifier of the package, including its name, category and version.
     :vartype id: ``str``
 
     :ivar description: A description of the package.
@@ -111,14 +99,17 @@ class Package():
     :ivar kind: The kind of the package. Effective means the package has data to install, while Virtual means the package has no data to install.
     :vartype kind: :py:class:`~stdlib.kind.Kind`
 
-    :ivar run_dependencies: A dictionary of runtime dependencies. The key is a package's full name, and the value is a version requirement.
-    :vartype run_dependencies: ``Dict`` [ ``str``, ``str`` ]
+    :ivar run_dependencies: A set of runtime dependencies. Each value is a string representing a package requirement.
+    :vartype run_dependencies: ``Set`` [ ``str`` ]
 
     :ivar wrap_cache: The path pointing to the cache where the files that belong to this package should be placed before the package is wrapped.
     :vartype wrap_cache: ``str``
 
     :ivar package_cache: The path pointing to the folder where the resulting package is placed after being wrapped.
     :vartype package_cache: ``str``
+
+    :ivar instructions: TODO FIXME
+    :vartype instructions: ``str``
     """
     def __init__(
         self,
@@ -129,7 +120,7 @@ class Package():
         licenses: List[stdlib.License] = None,
         upstream_url: str = None,
         kind: stdlib.kind.Kind = None,
-        run_dependencies: Dict[str, str]={},
+        run_dependencies: List[str] = set(),
     ):
         from core.cache import get_wrap_cache, get_package_cache
 
@@ -148,12 +139,31 @@ class Package():
         self.wrap_cache = get_wrap_cache(self)
         self.package_cache = get_package_cache(self)
 
+        self.instructions = None
+
         if os.path.exists(self.wrap_cache):
             shutil.rmtree(self.wrap_cache)
         os.makedirs(self.wrap_cache)
 
         if not os.path.exists(self.package_cache):
             os.makedirs(self.package_cache)
+
+    def set_instructions(self, instructions: str):
+        """TODO FIXME
+        """
+        self.instructions = instructions
+
+    def load_instructions(self, path: str):
+        """TODO FIXME
+        """
+        build = stdlib.build.current_build()
+
+        path = os.path.join(
+            os.path.dirname(build.manifest.path),
+            path,
+        )
+        with open(path, 'r') as file:
+            self.set_instructions(file.read())
 
     def is_empty(self) -> bool:
         """Test whether the ``wrap_cache`` of this :py:class:`.Package` contains at least a single file.
@@ -167,7 +177,7 @@ class Package():
                 return False
         return True
 
-    def drain(self, *paths: str):
+    def drain(self, *paths: str, recursive: bool = True):
         """Drain the current :py:class:`.Build`, moving files from their ``install_cache`` to this
         :py:class:`.Package`'s ``wrap_cache``.
 
@@ -184,6 +194,8 @@ class Package():
 
         :param paths: The paths pointing to the files to move, relative to the ``install_cache`` of the current :py:class:`.Build`.
             This argument supports the globbing and braces syntax of common shells.
+        :param recursive: Indicate whether or not the recursive globbing syntax (``**``) should be supported, as it is quite time-consuming on large
+            directory structures. Default value is ``True``.
         """
         build = stdlib.build.current_build()
 
@@ -195,7 +207,8 @@ class Package():
                     if os.path.isabs(rglob):
                         raise ValueError("Package.drain() received an absolute path as parameter, but it expects a relative one")
 
-                    for rpath in glob.glob(rglob):  # Expand globbing
+                    for rpath in glob.glob(rglob, recursive=recursive):  # Expand globbing
+
                         dstpath = os.path.join(
                             self.wrap_cache,
                             os.path.relpath(
@@ -204,10 +217,13 @@ class Package():
                             ),
                         )
 
-                        os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
-                        shutil.move(rpath, dstpath)
+                        try:
+                            os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
+                            shutil.move(rpath, dstpath)
+                        except:
+                            pass
 
-    def drain_package(self, source, *paths: str):
+    def drain_package(self, source, *paths: str, recursive: bool = True):
         """Drain a :py:class:`.Package`, moving files from its ``wrap_cache`` to this :py:class:`.Package`'s ``wrap_cache``.
 
         This function is mostly used to grab the files that were wrongly assigned to another package by the package splitter.
@@ -226,6 +242,10 @@ class Package():
         :type source: :py:class:`.Package`
         :param paths: The paths pointing to the files to move, relative to the ``wrap_cache`` of the given :py:class:`.Package`.
             This argument supports the globbing and braces syntax of common shells.
+        :param paths: The paths pointing to the files to move, relative to the ``install_cache`` of the current :py:class:`.Build`.
+            This argument supports the globbing and braces syntax of common shells.
+        :param recursive: Indicate whether or not the recursive globbing syntax (``**``) should be supported, as it is quite time-consuming on large
+            directory structures. Default value is ``True``.
         """
         with stdlib.pushd(source.wrap_cache):
             for rglob in paths:
@@ -234,7 +254,7 @@ class Package():
                     if os.path.isabs(rglob):
                         raise ValueError("Package.drain_package() received an absolute path as parameter, but it expects a relative one")
 
-                    for rpath in glob.glob(rglob):  # Expand globbing
+                    for rpath in glob.glob(rglob, recursive=recursive):  # Expand globbing
                         dstpath = os.path.join(
                             self.wrap_cache,
                             os.path.relpath(
@@ -243,10 +263,13 @@ class Package():
                             ),
                         )
 
-                        os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
-                        shutil.move(rpath, dstpath)
+                        try:
+                            os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
+                            shutil.move(rpath, dstpath)
+                        except:
+                            pass
 
-    def drain_build_cache(self, src, dst):
+    def drain_build_cache(self, src: str, dst: str, recursive: bool = True):
         """Drain the current :py:class:`.Build`, moving files from its ``build_cache`` to this package's ``wrap_cache``.
 
         This function is mostly used to grab files that are given with the software's source code but aren't
@@ -264,7 +287,10 @@ class Package():
         :param src: A path pointing to the files to move, relative to the ``build_cache`` of the current :py:class:`.Build`,
             This argument supports the globbing and braces syntax of common shells.
         :param dst: A path pointing to the directory where the files should be moved, relative to the ``wrap_cache`` of this :py:class:`.Package`,
-
+        :param paths: The paths pointing to the files to move, relative to the ``install_cache`` of the current :py:class:`.Build`.
+            This argument supports the globbing and braces syntax of common shells.
+        :param recursive: Indicate whether or not the recursive globbing syntax (``**``) should be supported, as it is quite time-consuming on large
+            directory structures. Default value is ``True``.
         """
         build = stdlib.build.current_build()
 
@@ -275,21 +301,26 @@ class Package():
         with stdlib.pushd(build.build_cache):
 
             for rglob in braceexpand.braceexpand(src):  # Expand braces
-                for rpath in glob.glob(rglob):  # Expand globbing
+                for rpath in glob.glob(rglob, recursive=recursive):  # Expand globbing
                     dstpath = os.path.join(
                         self.wrap_cache,
                         dst,
                     )
 
-                    os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
-                    shutil.move(rpath, dstpath)
+                    try:
+                        os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
+                        shutil.move(rpath, dstpath)
+                    except:
+                        pass
 
-    def move(self, srcs: str, dst: str):
+    def move(self, srcs: str, dst: str, recursive: bool = True):
         """Move the files pointed to by ``srcs`` to ``dst``.
 
         :param srcs: The paths pointing to the files to move, relative to the ``wrap_cache`` of this :py:class:`.Package`.
             This argument supports the globbing and braces syntax of common shells.
         :param dst: A path pointing to the destination folder, relative to the ``wrap_cache`` of this :py:class:`.Package`.
+        :param recursive: Indicate whether or not the recursive globbing syntax (``**``) should be supported, as it is quite time-consuming on large
+            directory structures. Default value is ``True``.
         """
 
         if os.path.isabs(dst):
@@ -297,19 +328,24 @@ class Package():
 
         with stdlib.pushd(self.wrap_cache):
             for srcs in braceexpand.braceexpand(srcs):  # Expand braces
-                for src in glob.glob(srcs):  # Expand globbing
+                for src in glob.glob(srcs, recursive=recursive):  # Expand globbing
 
                     if os.path.isabs(src):
                         raise ValueError("Package.move() received an absolute path as parameter, but it expects a relative one")
 
-                    os.makedirs(os.path.dirname(dst), exist_ok=True)  # Create parent directories (if any)
-                    shutil.move(src, dst)
+                    try:
+                        os.makedirs(os.path.dirname(dst), exist_ok=True)  # Create parent directories (if any)
+                        shutil.move(src, dst)
+                    except:
+                        pass
 
-    def remove(self, *files: str):
+    def remove(self, *files: str, recursive: bool = True):
         """Remove the files pointed to by ``files``.
 
         :param files: The paths pointing to the files to remove, relative to the ``wrap_cache`` of this :py:class:`.Package`.
             This argument supports the globbing and braces syntax of common shells.
+        :param recursive: Indicate whether or not the recursive globbing syntax (``**``) should be supported, as it is quite time-consuming on large
+            directory structures. Default value is ``True``.
         """
 
         with stdlib.pushd(self.wrap_cache):
@@ -319,11 +355,14 @@ class Package():
                     raise ValueError("Package.remove() received an absolute path as parameter, but it expects a relative one")
 
                 for srcs in braceexpand.braceexpand(file):  # Expand braces
-                    for src in glob.glob(srcs):  # Expand globbing
-                        if os.path.isdir(src):
-                            shutil.rmtree(src)
-                        else:
-                            os.remove(src)
+                    for src in glob.glob(srcs, recursive=True):  # Expand globbing
+                        try:
+                            if os.path.isdir(src):
+                                shutil.rmtree(src)
+                            else:
+                                os.remove(src)
+                        except:
+                            pass
 
     def make_keepers(self, *keepers: str):
         """Create a hidden files in each given repositories.
@@ -385,22 +424,16 @@ class Package():
         """
         if version_req is None:
             version_req = f'={package.id.version}'
-        self.run_dependencies[package.id.full_name()] = version_req
+        self.run_dependencies.add(f'{package.id.short_name()}#{version_req}')
 
-    def rdepends_on(self, short_name: str, version_req: str, repository: str=None):
-        """Add a new dependency for the current package formed by the given package short name, the targetted repository, and the given version requirement.
+    def requires(self, package_req: str):
+        """Add a new dependency to the current package.
 
-        This is equivalent to adding the requirement manually through ``self.run_dependencies``, but
-        the requirement is made automatically and the targeted repository doesn't have to be hardly written in the build manifest.
+        This is equivalent to adding the requirement manually through ``self.run_dependencies``.
 
-        :param short_name: The short name this package depends on
-
-        :param version_req: The version of ``short_name`` required to fulfill this requirement.
-            It must be expressed using Semantic Versioning 2.0.0 requirements syntax, like ``>=2.0.0`` or ``~1.5.2``.
+        :param package_req: The requirement to add.
         """
-        target = core.config.get_config()['global']['target']
-
-        self.run_dependencies[f'{target}::{short_name}'] = version_req
+        self.run_dependencies.add(package_req)
 
     def wrap(self):
         """Wrap the package by creating all the files needed by the repository (``nest-server``) to publish the package and putting
@@ -419,8 +452,8 @@ class Package():
         stdlib.log.slog(f"wrap_date: {datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'}")
         stdlib.log.slog(f"dependencies:")
         with stdlib.log.pushlog():
-            for (full_name, version_req) in self.run_dependencies.items():
-                stdlib.log.slog(f"{full_name}#{version_req}")
+            for dependency in self.run_dependencies:
+                stdlib.log.slog(f"{dependency}")
         stdlib.log.slog()
 
         if self.kind == stdlib.kind.Kind.EFFECTIVE:
@@ -448,7 +481,7 @@ class Package():
 
         stdlib.log.slog("Creating manifest.toml")
         toml_path = os.path.join(self.package_cache, 'manifest.toml')
-        with open(toml_path, "w") as filename:
+        with open(toml_path, 'w') as filename:
             manifest = {
                 'name': self.id.name,
                 'category': self.id.category,
@@ -462,9 +495,15 @@ class Package():
                 },
                 'kind': self.kind.value,
                 'wrap_date': datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
-                'dependencies': self.run_dependencies,
+                'dependencies': list(self.run_dependencies),
             }
             toml.dump(manifest, filename)
+
+        if self.instructions is not None:
+            stdlib.log.slog("Creating instructions.sh")
+            instructions_path = os.path.join(self.package_cache, 'instructions.sh')
+            with open(instructions_path, 'w') as instructions:
+                instructions.write(self.instructions)
 
         stdlib.log.slog(f"Creating {self.id.name}-{self.id.version}.nest")
         with stdlib.pushd(self.package_cache):
@@ -473,11 +512,15 @@ class Package():
                 archive.add('./manifest.toml')
                 if self.kind == stdlib.kind.Kind.EFFECTIVE:
                     archive.add('./data.tar.gz')
+                if self.instructions is not None:
+                    archive.add('./instructions.sh')
 
-            # Remove temporary manifest.toml and data.tar.gz
+            # Remove temporary manifest.toml, data.tar.gz and instructions.sh
             os.remove('./manifest.toml')
             if self.kind == stdlib.kind.Kind.EFFECTIVE:
                 os.remove('./data.tar.gz')
+            if self.instructions is not None:
+                os.remove('./instructions.sh')
 
     def __str__(self):
         return str(self.id)

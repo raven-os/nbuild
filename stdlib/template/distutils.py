@@ -73,6 +73,7 @@ def build(
     check=distutils_check,
     install=distutils_install,
     split=stdlib.split.drain_all.drain_all_with_doc,
+    deplinker=None,
 ):
     """Download, build and wrap a software based on ``python``'s ``distutils``.
 
@@ -84,6 +85,7 @@ def build(
         * ``check``
         * ``install``
         * ``split``
+        * ``dependency linking``
 
     For each one of these steps, a function is called. This template simply calls each of them in the above order.
     All of these functions can be given as arguments, but each one of them has a default value that is explained below.
@@ -117,38 +119,43 @@ def build(
 
         This step automatically splits the output of the build into multiple packages. The default value is :py:func:`~stdlib.split.drain_all.drain_all_with_doc`.
         Alternative splitters can be found in the :py:mod:`~stdlib.split` module.
+
+    **Dependency Linking**
+
+        This step automatically finds requirements for the generated packages. The default value is ``None``.
+        Alternative dependency linkers can be found in the :py:mod:`~stdlib.deplinker` module.
     """
-    stdlib.log.ilog("Step 1/7: Fetch")
+    stdlib.log.ilog("Step 1/8: Fetch")
     if fetch is not None:
         with stdlib.log.pushlog():
             fetch()
 
-    stdlib.log.ilog("Step 2/7: Extract")
+    stdlib.log.ilog("Step 2/8: Extract")
     if extract is not None:
         with stdlib.log.pushlog():
             extract()
 
-    stdlib.log.ilog("Step 3/7: Patch")
+    stdlib.log.ilog("Step 3/8: Patch")
     if patch is not None:
         with stdlib.log.pushlog():
             patch()
 
-    stdlib.log.ilog("Step 4/7: Build")
+    stdlib.log.ilog("Step 4/8: Build")
     if build is not None:
         with stdlib.log.pushlog():
             build()
 
-    stdlib.log.ilog("Step 5/7: Check")
+    stdlib.log.ilog("Step 5/8: Check")
     if check is not None:
         with stdlib.log.pushlog():
             check()
 
-    stdlib.log.ilog("Step 6/7: Install")
+    stdlib.log.ilog("Step 6/8: Install")
     if install is not None:
         with stdlib.log.pushlog(), stdlib.pushenv():
             install()
 
-    stdlib.log.ilog("Step 7/7: Split")
+    stdlib.log.ilog("Step 7/8: Split")
     if split is not None:
         with stdlib.log.pushlog():
             packages = split()
@@ -159,5 +166,10 @@ def build(
                 with stdlib.log.pushlog():
                     for package in packages.values():
                         stdlib.log.ilog(str(package))
+
+    stdlib.log.ilog("Step 8/8: Dependency Linking")
+    if deplinker is not None:
+        with stdlib.log.pushlog():
+            deplinker(packages)
 
     return packages

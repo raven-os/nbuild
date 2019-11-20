@@ -102,17 +102,15 @@ def build(
 
     **Build**
 
-        This step compiles the source code. The default value is :py:func:`.cargo`, running the ``build`` subcommand.
+        This step compiles the source code. The default value is :py:func:`.cargo_build`, with no argument.
 
     **Check**
 
-        This step runs the unit and integration tests. The default value is :py:func:`.cargo`, running the ``check`` subcommand.
+        This step runs the unit and integration tests. The default value is :py:func:`.cargo_check`, with no argument.
 
     **Install**
 
-        This step installs the software in the install cache.
-
-        TODO FIXME
+        This step installs the software in the install cache. The default value is :py:func:`.cargo_install`, with no argument.
 
     **Split**
 

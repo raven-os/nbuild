@@ -20,7 +20,7 @@ def ninja(
     :param build_type: Build type to use. Default: ``release``.
     :param build_folder: The build folder when object files should be put. Default: ``.``.
     :param source_folder: The source folder to setup. Default: ``.``.
-    :param fail_ok: If ``False``, the execution is aborted if ``cargo`` fails.
+    :param fail_ok: If ``False``, the execution is aborted if ``ninja`` fails.
         The default value is ``False``.
     """
     stdlib.cmd(f'''{binary} -C "{folder}" {' '.join(args)} ''', fail_ok=fail_ok)

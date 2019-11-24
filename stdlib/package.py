@@ -13,11 +13,11 @@ import glob
 import core.config
 import stdlib.log
 import stdlib.kind
-from typing import List, Dict
+from typing import List, Set
 from termcolor import colored
 
 
-class PackageID():
+class PackageID:
     """The unique identifier of a package: its category, name and version.
 
     :param name: The name of the package. The name should be in ``snake-case``.
@@ -53,7 +53,7 @@ class PackageID():
         return f'{self.short_name()}#{self.version}'
 
 
-class Package():
+class Package:
     """A package, the output of a :py:class:`~stdlib.build.Build`.
 
     :param id: The unique identifier of the package, including its name, category and version.
@@ -120,7 +120,7 @@ class Package():
         licenses: List[stdlib.License] = None,
         upstream_url: str = None,
         kind: stdlib.kind.Kind = None,
-        run_dependencies: List[str] = set(),
+        run_dependencies: Set[str] = None,
     ):
         from core.cache import get_wrap_cache, get_package_cache
 
@@ -134,7 +134,7 @@ class Package():
         self.licenses = licenses if licenses is not None else build.manifest.metadata.licenses
         self.upstream_url = upstream_url if upstream_url is not None else build.manifest.metadata.upstream_url
         self.kind = kind if kind is not None else build.manifest.metadata.kind
-        self.run_dependencies = copy.deepcopy(run_dependencies)
+        self.run_dependencies = run_dependencies or set()
 
         self.wrap_cache = get_wrap_cache(self)
         self.package_cache = get_package_cache(self)

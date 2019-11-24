@@ -19,7 +19,7 @@ def meson(
     :param binary: The command or path to use. The default value is ``meson``.
     :param backend: Backend to use. Default: ``ninja``.
     :param build_type: Build type to use. Default: ``release``.
-    :param fail_ok: If ``False``, the execution is aborted if ``cargo`` fails.
+    :param fail_ok: If ``False``, the execution is aborted if ``meson`` fails.
         The default value is ``False``.
     """
     stdlib.cmd(f'''\

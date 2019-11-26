@@ -37,7 +37,7 @@ def ninja_test(
     :param fail_ok: If ``False``, the execution is aborted if ``ninja`` fails.
         The default value is ``False``.
     """
-    ninja('test', *args)
+    ninja('test', *args, binary=binary, folder=folder, fail_ok=fail_ok)
 
 
 def ninja_install(
@@ -58,4 +58,4 @@ def ninja_install(
     with stdlib.pushenv():
         if not os.environ['DESTDIR']:
             os.environ['DESTDIR'] = stdlib.build.current_build().install_cache
-    ninja('install', *args)
+    ninja('install', *args, binary=binary, folder=folder, fail_ok=fail_ok)

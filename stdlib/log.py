@@ -31,7 +31,7 @@ def dlog(*logs: str):
     global log_tab_level
 
     indent = '    ' * log_tab_level
-    print(f"{termcolor.colored('[d]', 'magenta', attrs=['bold'])} {indent}", *logs)
+    print(f"{termcolor.colored('[d]', 'magenta', attrs=['bold'])} {indent}", *logs, flush=True)
 
 
 def ilog(*logs: str):
@@ -42,7 +42,7 @@ def ilog(*logs: str):
     global log_tab_level
 
     indent = '    ' * log_tab_level
-    print(f"{termcolor.colored('[*]', 'blue', attrs=['bold'])} {indent}", *logs)
+    print(f"{termcolor.colored('[*]', 'blue', attrs=['bold'])} {indent}", *logs, flush=True)
 
 
 def slog(*logs: str):
@@ -53,7 +53,7 @@ def slog(*logs: str):
     global log_tab_level
 
     indent = '    ' * log_tab_level
-    print(f"{termcolor.colored('[+]', 'green', attrs=['bold'])} {indent}", *logs)
+    print(f"{termcolor.colored('[+]', 'green', attrs=['bold'])} {indent}", *logs, flush=True)
 
 
 def wlog(*logs: str):
@@ -64,7 +64,7 @@ def wlog(*logs: str):
     global log_tab_level
 
     indent = '    ' * log_tab_level
-    print(f"{termcolor.colored('[!]', 'yellow', attrs=['bold'])} {indent}", *logs)
+    print(f"{termcolor.colored('[!]', 'yellow', attrs=['bold'])} {indent}", *logs, flush=True)
 
 
 def elog(*logs: str):
@@ -75,7 +75,7 @@ def elog(*logs: str):
     global log_tab_level
 
     indent = '    ' * log_tab_level
-    print(f"{termcolor.colored('[-]', 'red', attrs=['bold'])} {indent}", *logs)
+    print(f"{termcolor.colored('[-]', 'red', attrs=['bold'])} {indent}", *logs, flush=True)
 
 
 def flog(*logs: str):

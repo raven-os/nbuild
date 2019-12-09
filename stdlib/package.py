@@ -4,6 +4,7 @@
 
 import copy
 import os
+import os.path
 import shutil
 import tarfile
 import toml
@@ -219,7 +220,7 @@ class Package:
 
                         try:
                             os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
-                            shutil.move(rpath, dstpath)
+                            _smart_move(rpath, dstpath)
                         except:
                             pass
 
@@ -265,7 +266,7 @@ class Package:
 
                         try:
                             os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
-                            shutil.move(rpath, dstpath)
+                            _smart_move(rpath, dstpath)
                         except:
                             pass
 
@@ -309,7 +310,7 @@ class Package:
 
                     try:
                         os.makedirs(os.path.dirname(dstpath), exist_ok=True)  # Create parent directories (if any)
-                        shutil.move(rpath, dstpath)
+                        _smart_move(rpath, dstpath)
                     except:
                         pass
 
@@ -335,7 +336,7 @@ class Package:
 
                     try:
                         os.makedirs(os.path.dirname(dst), exist_ok=True)  # Create parent directories (if any)
-                        shutil.move(src, dst)
+                        _smart_move(src, dst)
                     except:
                         pass
 
@@ -545,3 +546,30 @@ def _colored_path(path, pretty_path=None):
         return colored(pretty_path, 'green', attrs=['bold'])
     else:
         return pretty_path
+
+
+def _smart_move(src, dst):
+    """A smart move that, if both dst and src are folders and have the same name, merges them instead of copying src inside dst.
+
+    Otherwise, it performs like shutil.move().
+    """
+    src_name = os.path.basename(src) or os.path.basename(os.path.dirname(src))
+    dst_name = os.path.basename(dst) or os.path.basename(os.path.dirname(dst))
+
+    if os.path.isdir(src) and os.path.isdir(dst) and src_name == dst_name:
+        for src_dir, _, files in os.walk(src):
+            dst_dir = src_dir.replace(src, dst + '/', 1)
+
+            if not os.path.exists(dst_dir):
+                os.makedirs(dst_dir)
+
+            for f in files:
+                src_file = os.path.join(src_dir, f)
+                dst_file = os.path.join(dst_dir, f)
+
+                if os.path.exists(dst_file):
+                    os.remove(dst_file)
+
+                shutil.move(src_file, dst_dir)
+    else:
+        shutil.move(src, dst)

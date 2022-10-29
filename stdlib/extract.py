@@ -20,7 +20,26 @@ def extract(
     """
     stdlib.log.ilog(f"Extracting {os.path.basename(path)}")
     with tarfile.open(path, mode='r') as tar:
-        tar.extractall()
+        def is_within_directory(directory, target):
+            
+            abs_directory = os.path.abspath(directory)
+            abs_target = os.path.abspath(target)
+        
+            prefix = os.path.commonprefix([abs_directory, abs_target])
+            
+            return prefix == abs_directory
+        
+        def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+        
+            for member in tar.getmembers():
+                member_path = os.path.join(path, member.name)
+                if not is_within_directory(path, member_path):
+                    raise Exception("Attempted Path Traversal in Tar File")
+        
+            tar.extractall(path, members, numeric_owner=numeric_owner) 
+            
+        
+        safe_extract(tar)
     stdlib.log.slog(f"Extracted in {os.getcwd()}")
 
 
@@ -50,7 +69,26 @@ def flat_extract(
             main_dir = os.path.commonpath(tar.getnames())
         except:
             pass
-        tar.extractall()
+        def is_within_directory(directory, target):
+            
+            abs_directory = os.path.abspath(directory)
+            abs_target = os.path.abspath(target)
+        
+            prefix = os.path.commonprefix([abs_directory, abs_target])
+            
+            return prefix == abs_directory
+        
+        def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+        
+            for member in tar.getmembers():
+                member_path = os.path.join(path, member.name)
+                if not is_within_directory(path, member_path):
+                    raise Exception("Attempted Path Traversal in Tar File")
+        
+            tar.extractall(path, members, numeric_owner=numeric_owner) 
+            
+        
+        safe_extract(tar)
 
     if main_dir is not None and os.path.exists(main_dir) and os.path.isdir(main_dir):
         for f in os.listdir(main_dir):
